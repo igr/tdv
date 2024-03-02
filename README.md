@@ -7,6 +7,8 @@ version: `0.1.0`
 Disclaimer: I am making this for my own use.
 I have no intention of making it a full-fledged tool 🤷‍♂️.
 
+You can still [buy me a coffee](https://www.buymeacoffee.com/oblac) :)
+
 ## Usage
 
 Download the fat jar and run it:
