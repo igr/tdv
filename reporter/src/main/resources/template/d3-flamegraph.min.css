@@ -1,0 +1,8 @@
+/**
+ * Minified by jsDelivr using clean-css v5.3.1.
+ * Original file: /npm/d3-flame-graph@4.1.3/dist/d3-flamegraph.css
+ *
+ * Do NOT use SRI with dynamically generated files! More information: https://www.jsdelivr.com/using-sri-with-dynamic-files
+ */
+.d3-flame-graph rect{stroke:#EEEEEE;fill-opacity:.8}.d3-flame-graph rect:hover{stroke:#474747;stroke-width:.5;cursor:pointer}.d3-flame-graph-label{pointer-events:none;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:12px;font-family:Verdana;margin-left:4px;margin-right:4px;line-height:1.5;padding:0 0 0;font-weight:400;color:#000;text-align:left}.d3-flame-graph .fade{opacity:.6!important}.d3-flame-graph .title{font-size:20px;font-family:Verdana}.d3-flame-graph-tip{background-color:#000;border:none;border-radius:3px;padding:5px 10px 5px 10px;min-width:250px;text-align:left;color:#fff;z-index:10}
+/*# sourceMappingURL=/sm/a7470b34ad0fa3694e267e14444173495191d088d2e091e1a2e0c0c619b11e4a.map */

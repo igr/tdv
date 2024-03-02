@@ -1,0 +1,449 @@
+{# @pebvariable name="td" type="dev.oblac.tdv.domain.ThreadDump" #}
+{# @pebvariable name="stats" type="dev.oblac.tdv.analyzer.ThreadDumpStats" #}
+{# @pebvariable name="blockTree" type="dev.oblac.tdv.analyzer.BlockTree" #}
+{# @pebvariable name="ex" type="dev.oblac.tdv.reporter.BlockExplanation" #}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thread Dump Viewer - {{ td.date }}</title>
+    <link href="d3-flamegraph.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f0f0;
+            margin: 60px 0 0 0;
+            padding: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-family: sans-serif;
+        }
+
+        footer {
+            background-color: #f0f0f0;
+            padding: 40px 0 10px 0;
+            text-align: center;
+        }
+
+        .grid21 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+            padding: 20px;
+        }
+
+        .boxes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .box {
+            display: flex;
+            flex-direction: column;
+            width: 200px;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+        .box-wide {
+            width: 30%;
+        }
+
+        .box-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .box-value {
+            font-size: 80px;
+            font-weight: bold;
+            text-align: center;
+        }
+        h1 {
+            font-family: serif;
+            font-size: 3rem;
+            padding: 10px;
+        }
+        h2 {
+            font-family: serif;
+            background-color: darkblue;
+            color: white;
+            font-size: 2rem;
+            padding: 10px;
+        }
+        h3 {
+            font-family: sans-serif;
+            font-size: 1.5rem;
+            padding: 10px;
+        }
+        h3 b {
+            background-color: lightyellow;
+            padding: 0 2px;
+        }
+        .graph {
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+        span.method {
+            background-color: bisque;
+        }
+        span.tid {
+            background-color: mistyrose;
+        }
+
+        .tree {
+            --spacing : 1.5rem;
+            --radius  : 10px;
+            text-align: left;
+        }
+        .tree li {
+            display      : block;
+            position     : relative;
+            padding-left : calc(2 * var(--spacing) - var(--radius) - 2px);
+        }
+        .tree ul {
+            margin-left  : calc(var(--radius) - var(--spacing));
+            padding-left : 0;
+        }
+        .tree ul li {
+            border-left : 2px solid #ddd;
+        }
+        .tree ul li:last-child {
+            border-color : transparent;
+        }
+        .tree ul li::before{
+            content      : '';
+            display      : block;
+            position     : absolute;
+            top          : calc(var(--spacing) / -2);
+            left         : -2px;
+            width        : calc(var(--spacing) + 2px);
+            height       : calc(var(--spacing) + 1px);
+            border       : solid #ddd;
+            border-width : 0 0 2px 2px;
+        }
+        .tree summary {
+            display : block;
+            cursor  : pointer;
+            padding : 6px 0;
+        }
+        .tree summary:hover {
+            background-color: #ddd;
+        }
+        .tree summary::marker,
+        .tree summary::-webkit-details-marker{
+            display : none;
+        }
+        .tree summary:focus{
+            outline : none;
+        }
+        .tree summary:focus-visible{
+            outline : 1px dotted #000;
+        }
+        .tree li::after,
+        .tree summary::before{
+            content       : '';
+            display       : block;
+            position      : absolute;
+            top           : calc(var(--spacing) / 2 - var(--radius));
+            left          : calc(var(--spacing) - var(--radius) - 1px);
+            width         : calc(2 * var(--radius));
+            height        : calc(2 * var(--radius));
+            border-radius : 50%;
+            background    : #ddd;
+        }
+        .tree summary::before{
+            margin-top: 4px;
+            z-index    : 1;
+            background : #696 url('expand-collapse.svg') 0 0;
+        }
+
+        .tree details[open] > summary::before{
+            background-position : calc(-2 * var(--radius)) 0;
+        }
+        header {
+            background-color: #333;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+        header a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            letter-spacing: -1px;
+        }
+        .styled-table {
+            border-collapse: collapse;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            margin: 25px auto;
+        }
+        .styled-table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+            text-align: left;
+        }
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+            vertical-align: top;
+        }
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="#threads">Threads</a>
+    <a href="#daemons">Daemons</a>
+    <a href="#gc">GC threads</a>
+    <a href="#blocks">Blocks</a>
+    <a href="#flamegraph">Flame Graph</a>
+    <a href="#callgraph">Call Graph</a>
+    <a href="#exceptions">Exceptions</a>
+    <a href="#cpu">CPU consuming</a>
+    <a href="#ust">Identical stack trace</a>
+</header>
+<main id="content">
+    <h1>{{ td.date }}</h1>
+    <div>{{ td.name }}</div>
+
+    <a id="threads"></a>
+    <div class="block">
+        <h2>🧵 Threads</h2>
+        <div class="grid21">
+            <div class="boxes">
+                <div class="box">
+                    <div class="box-title">TOTAL</div>
+                    <div class="box-value">{{ stats.totalThreads }}</div>
+                </div>
+                <div class="box">
+                    <div class="box-title">TERMINATED</div>
+                    <div class="box-value">{{ stats.terminatedThreads }}</div>
+                </div>
+                <div class="box">
+                    <div class="box-title">RUNNABLE</div>
+                    <div class="box-value">{{ stats.runnableThreads }}</div>
+                </div>
+                <div class="box">
+                    <div class="box-title">BLOCKED</div>
+                    <div class="box-value">{{ stats.blockedThreads }}</div>
+                </div>
+                <div class="box">
+                    <div class="box-title">TIMED_WAITING</div>
+                    <div class="box-value">{{ stats.timedWaitingThreads }}</div>
+                </div>
+                <div class="box">
+                    <div class="box-title">WAITING</div>
+                    <div class="box-value">{{ stats.waitingThreads }}</div>
+                </div>
+            </div>
+            <div id="chart_threads" style="width:600px;height:500px;"></div>
+        </div>
+    </div>
+
+    <a id="daemons"></a>
+    <div class="block">
+        <h2>😈 Daemons</h2>
+        <div class="grid21">
+            <div class="boxes">
+                <div class="box">
+                    <div class="box-title">TOTAL</div>
+                    <div class="box-value">{{ stats.totalThreads }}</div>
+                </div>
+                <div class="box">
+                    <div class="box-title">DAEMON</div>
+                    <div class="box-value">{{ stats.daemonCount }}</div>
+                </div>
+                <div class="box">
+                    <div class="box-title">NON-DAEMON</div>
+                    <div class="box-value">{{ stats.nonDaemonCount }}</div>
+                </div>
+            </div>
+            <div id="chart_daemons" style="width:400px;height:400px;"></div>
+        </div>
+    </div>
+
+    <a id="gc"></a>
+    <div class="block">
+        <h2>🧹 GC Threads: {{ stats.gcTotalThreads }}</h2>
+        <div class="grid21">
+            <div class="boxes">
+                <div class="box">
+                    <div class="box-title">WORKER</div>
+                    <div class="box-value">{{ stats.gcWorkerThreads }}</div>
+                </div>
+                <div class="box">
+                    <div class="box-title">CONCURRENT</div>
+                    <div class="box-value">{{ stats.gcConcurrentThreads }}</div>
+                </div>
+                <div class="box">
+                    <div class="box-title">REFINE</div>
+                    <div class="box-value">{{ stats.gcRefineThreads }}</div>
+                </div>
+            </div>
+            <div id="chart_gc" style="width:400px;height:400px;"></div>
+        </div>
+    </div>
+
+    <a id="blocks"></a>
+    <div class="block">
+        <h2>🛑 Blocks</h2>
+        {% for blockNode in blockTree %}
+            {% set ex = explain.get(loop.index) %}
+            <h3>The method <b>{{ ex.className }}.<span class="method">{{ ex.methodName }}</span></b> (line #{{ ex.fileLine }}) is blocking <b>{{ ex.blocking }}</b> threads.</h3>
+            <p><b>{{ ex.threadName }}</b> thread is stuck on <b>{{ ex.stuckClassName }}.{{ ex.stuckMethodName }}</b> (line #{{ ex.stuckLine }}).<br>
+                Before getting stuck, this thread obtained <b>{{ ex.locksCount }}</b> locks and never released it.<br>
+                Due to that, <b>{{ ex.blocking }}</b> threads are BLOCKED as shown in the below graph.</p>
+        <div class="graph">
+            <div id="blockTree_{{ loop.index }}"></div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <a id="flamegraph"></a>
+    <div class="block">
+        <h2>🔥 Flamegraph</h2>
+        <div class="graph">
+            <div id="flamechart"></div>
+        </div>
+    </div>
+
+    <a id="callgraph"></a>
+    <div class="block">
+        <h2>☎️ Call Tree</h2>
+        <div class="graph">
+        {{ callgraph | raw }}
+        </div>
+    </div>
+
+    <a id="exceptions"></a>
+    <div class="block">
+        <h2>🚨 Exceptions</h2>
+        <div class="graph" style="text-align: left">
+            <div class="boxes">
+        {% for ed in exceptions %}
+            <div class="box box-wide">
+                <b>{{ ed.threadName }}</b> <span class="tid">{{ ed.threadId }}</span><br>
+                <p style="font-size: 0.8rem">
+                {% for e in ed.exceptions %}{{ e }}<br>{% endfor %}
+                </p>
+            </div>
+        {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <a id="cpu"></a>
+    <div class="block">
+        <h2>🍪 CPU consuming threads</h2>
+        <div class="graph" style="text-align: left">
+        {% for c in cpuc %}
+        <p>
+            [{{ c.percentage | numberformat('#.##') }}%] <b>{{ c.threadName }}</b> <span class="tid">{{ c.threadId }}</span><br>
+        </p>
+        {% endfor %}
+        </div>
+    </div>
+
+    <a id="ust"></a>
+    <div class="block">
+        <h2>🪞Threads with identical stack trace (top 10)</h2>
+        <div class="graph">
+            <table class="styled-table">
+            <thead>
+            <tr>
+                <th>Thread</th>
+                <th>Count</th>
+                <th>Stack Trace</th>
+            </tr>
+            </thead>
+            {% for ust in usts %}
+            <tr>
+                <td>{{ ust.name }}<br><span class="tid">{{ ust.tid }}</span></td>
+                <td>{{ ust.count }}</td>
+                <td style="font-size: 0.8rem">
+                    {{ ust.state }}<br>
+                    {% for st in ust.stackTrace %}
+                    {{ st }}<br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer>🚀 TDV</footer>
+</body>
+<script src="d3.v7.min.js"></script>
+<script src="canvasjs.min.js"></script>
+<script src="charts.js"></script>
+<script src="tree.js"></script>
+<script type="text/javascript" src="d3-flamegraph.min.js"></script>
+<script>
+    const threadsData = [
+        {"name": "TERMINATED", y:{{ stats.terminatedThreadsPercent | numberformat("#.##") }} },
+        {"name": "BLOCKED", y:{{ stats.blockedThreadsPercent | numberformat("#.##") }} },
+        {"name": "WAITING", y:{{ stats.waitingThreadsPercent | numberformat("#.##") }} },
+        {"name": "RUNNABLE", y:{{ stats.runnableThreadsPercent | numberformat("#.##") }} },
+        {"name": "TIMED_WAITING", y:{{ stats.timedWaitingThreadsPercent | numberformat("#.##") }} },
+    ];
+    const daemonsData = [
+        {"name": "DAEMON", y:{{ stats.daemonCountPercent | numberformat("#.##") }} },
+        {"name": "NON-DAEMON", y:{{ stats.nonDaemonCountPercent | numberformat("#.##") }} },
+    ]
+    const gcStats = [
+        { label: "Worker", y:{{ stats.gcWorkerThreadsPercent | numberformat("#.##") }} },
+        { label: "Concurrent", y:{{ stats.gcConcurrentThreadsPercent | numberformat("#.##") }} },
+        { label: "Refine", y:{{ stats.gcRefineThreadsPercent | numberformat("#.##") }} },
+    ]
+
+    {% for blockNode in blockTree %}
+    const blockTree_{{ loop.index }} = {{ blockNode | json | raw }};
+    {% endfor %}
+
+    const flamegraphData = {{ flamegraph | json | raw }};
+
+    window.onload = function () {
+        drawThreadsPieChar("chart_threads", "Thread state %", threadsData);
+        drawThreadsPieChar("chart_daemons", "Daemon vs Non-Daemon %", daemonsData);
+        drawThreadsPieChar("chart_gc", "GC threads %", gcStats);
+
+        {% for blockNode in blockTree %}
+        const blockTreeChart_{{ loop.index }} = Tree(blockTree_{{ loop.index }}, {
+            label: d => d.name,
+            title: (d, n) => `${n.data.popup}`, // hover text
+            r: 8,
+            fontSize: 14,
+            deltaX: 30,
+            fill: "red",
+            width: 1200
+        })
+        document.getElementById("blockTree_{{ loop.index }}").appendChild(blockTreeChart_{{ loop.index }});
+        {% endfor %}
+
+        const chart = flamegraph().width(1200);
+        d3.select("#flamechart")
+            .datum(flamegraphData)
+            .call(chart);
+    };
+</script>
+</html>
