@@ -2,12 +2,12 @@
 
 version: `0.1.0`
 
-🚀 **Offline** Thread Dump Analyzer for JVM.
+🚀 **Offline** Thread Dump Analyzer.
 
 Disclaimer: I am making this for my own use.
 I have no intention of making it a full-fledged tool 🤷‍♂️.
 
-You can still [buy me a coffee](https://www.buymeacoffee.com/oblac) :)
+☕️ You can still [buy me a coffee](https://www.buymeacoffee.com/oblac) :)
 
 ## Usage
 
@@ -18,6 +18,7 @@ java -jar tdv-0.1.0-all.jar <thread-dump-file>
 ```
 
 The report will be generated in the `out` subfolder as HTML file.
+It is a huge report, and it is not beautiful, but it is functional.
 
 ## TDV Report
 
