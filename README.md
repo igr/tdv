@@ -1,7 +1,5 @@
 # Thread Dump Viewer
 
-version: `0.1.0`
-
 🚀 **Offline** Thread Dump Analyzer.
 
 Disclaimer: I am making this for my own use.
@@ -14,7 +12,7 @@ I have no intention of making it a full-fledged tool 🤷‍♂️.
 Download the fat jar and run it:
 
 ```shell
-java -jar tdv-0.1.0-all.jar <thread-dump-file>
+java -jar tdv-X.Y.Z-all.jar <thread-dump-file>
 ```
 
 The report will be generated in the `out` subfolder as HTML file.
