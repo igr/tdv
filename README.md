@@ -38,6 +38,12 @@ The report will contain the following sections:
 
 ![](doc/3-gc.png)
 
+### 🏊‍♂️ Pools
+
+Resolve thread pools from similar thread names.
+
+![](doc/10-thread-pools.png)
+
 ### 🛑 Blocks
 
 Analysis of all the blocks in the thread dump.
@@ -77,7 +83,8 @@ Sort threads by CPU consumption.
 
 ## TODO
 
-+ [ ] Detect thread pools
-+ [ ] Add deadlocks detection (as soon as I get a thread dump with a deadlock)
++ [ ] Stats per thread pool
++ [ ] Deadlocks detection (as soon as I get a thread dump with a deadlock)
 + [ ] Detect complex deadlocks (e.g. A -> B -> C -> A)
-+ [ ] Make thread histogram per priorities
++ [ ] Thread histogram per priorities
++ [ ] Latest executed methods?

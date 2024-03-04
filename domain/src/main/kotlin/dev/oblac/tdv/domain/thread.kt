@@ -79,3 +79,8 @@ enum class ThreadState {
 
 @JvmInline
 value class ThreadSubStatus(private val value: String)
+
+@JvmInline
+value class ThreadPoolName(private val value: String) {
+    override fun toString() = value
+}

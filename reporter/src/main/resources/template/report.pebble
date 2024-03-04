@@ -15,6 +15,7 @@
     <a href="#threads">Threads</a>
     <a href="#daemons">Daemons</a>
     <a href="#gc">GC threads</a>
+    <a href="#pools">Pools</a>
     <a href="#blocks">Blocks</a>
     <a href="#flamegraph">Flame Graph</a>
     <a href="#callgraph">Call Graph</a>
@@ -101,6 +102,27 @@
                 </div>
             </div>
             <div id="chart_gc" style="width:400px;height:400px;"></div>
+        </div>
+    </div>
+
+    <a id="pools"></a>
+    <div class="block">
+        <h2>🏊‍♂️ Thread Pools</h2>
+        <div class="graph">
+            <table class="styled-table">
+                <thead>
+                <tr>
+                    <th>Count</th>
+                    <th>Thread Pool</th>
+                </tr>
+                </thead>
+                {% for pool in pools %}
+                <tr>
+                    <td><b>{{ pool.count }}</b></td>
+                    <td>{{ pool.name }}</td>
+                </tr>
+            {% endfor %}
+            </table>
         </div>
     </div>
 

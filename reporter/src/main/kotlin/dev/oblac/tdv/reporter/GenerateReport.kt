@@ -63,6 +63,15 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
                         it.count,
                         it.threadInfo.stackTrace.map { it.toString() })
                 }
+        context["pools"] =
+            tda.threadPools
+                .takeWhile { it.count >= 10 }
+                .map {
+                    ReportThreadGroup(
+                        it.name.toString(),
+                        it.count
+                    )
+                }
 
         val writer = StringWriter()
         compiledTemplate.evaluate(writer, context)

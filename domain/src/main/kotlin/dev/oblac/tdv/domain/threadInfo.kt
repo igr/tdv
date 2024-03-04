@@ -29,3 +29,9 @@ data class SystemThreadInfo(
     val nid: NativeId,
     val state: ThreadState,
 ) : ThreadInfo
+
+data class ThreadPoolInfo(
+    val name: ThreadPoolName,
+    val count: Int,
+    val threads: Set<JVMThreadInfo>
+)

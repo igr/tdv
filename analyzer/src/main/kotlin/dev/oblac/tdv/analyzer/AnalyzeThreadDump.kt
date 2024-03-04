@@ -11,7 +11,8 @@ object AnalyzeThreadDump : (ThreadDump) -> ThreadDumpAnalysis {
             callTree = MakeCallTree(td),
             exceptions = FilterExceptionThreads(td),
             maxCpuThreads = FindTopCpuThreads(td, 10),
-            uniqueStackTraces = GroupUniqueStackTraces(td)
+            uniqueStackTraces = GroupUniqueStackTraces(td),
+            threadPools = ResolveThreadPools(td),
         )
 	}
 }
