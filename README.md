@@ -24,6 +24,8 @@ It is a huge report, and it is not beautiful, but it is functional.
 
 The report will contain the following sections:
 
+> ⚠️ The screenshots are probably not up-to-date!
+
 ### 🧵 Threads stats
 
 ![](doc/1-stats.png)
