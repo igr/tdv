@@ -2,6 +2,8 @@ package dev.oblac.tdv.reporter
 
 import dev.oblac.tdv.analyzer.ThreadDumpAnalysis
 import dev.oblac.tdv.domain.ThreadDump
+import dev.oblac.tdv.reporter.pebble.JsonWriterPebbleExtension
+import dev.oblac.tdv.reporter.pebble.StringContainsOneOf
 import io.pebbletemplates.pebble.PebbleEngine
 import java.io.StringWriter
 
@@ -10,6 +12,7 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
     override fun invoke(td: ThreadDump, tda: ThreadDumpAnalysis, name: String): Report {
         val engine = PebbleEngine.Builder()
             .extension(JsonWriterPebbleExtension())
+            .extension(StringContainsOneOf())
             .build()
         val compiledTemplate = engine.getTemplate("template/report.pebble")
 
@@ -34,10 +37,14 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
         context["exceptions"] =
             tda.exceptions
                 .map {
-                    ReportExceptionData(it.name.toString(), it.tid.toString(),
+                    ReportExceptionData(
+                        it.name.toString(),
+                        it.tid.toString(),
                         it.stackTrace.filter { it.className.isAnyException() }
                             .map { it.className.toString() }
-                            .distinct().toList())
+                            .distinct().toList(),
+                        it.stackTrace.map { it.toString() }.toList()
+                    )
                 }
         context["cpuc"] =
             tda.maxCpuThreads.map {
@@ -65,6 +72,7 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
         return Report(
             listOf(
                 ReportFile("report-${name}.html", writer.toString()),
+                ResourceFile("style.css").toReportFile(),
                 ResourceFile("canvasjs.min.js").toReportFile(),
                 ResourceFile("d3.v7.min.js").toReportFile(),
                 ResourceFile("d3-flamegraph.min.css").toReportFile(),

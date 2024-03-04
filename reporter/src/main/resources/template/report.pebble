@@ -6,207 +6,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thread Dump Viewer - {{ td.date }}</title>
+    <title>Thread Dump : {{ td.date }}</title>
     <link href="d3-flamegraph.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f0f0f0;
-            margin: 60px 0 0 0;
-            padding: 20px;
-            text-align: center;
-            font-size: 16px;
-            font-family: sans-serif;
-        }
-
-        footer {
-            background-color: #f0f0f0;
-            padding: 40px 0 10px 0;
-            text-align: center;
-        }
-
-        .grid21 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-gap: 20px;
-            padding: 20px;
-        }
-
-        .boxes {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .box {
-            display: flex;
-            flex-direction: column;
-            width: 200px;
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-        }
-        .box-wide {
-            width: 30%;
-        }
-
-        .box-title {
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .box-value {
-            font-size: 80px;
-            font-weight: bold;
-            text-align: center;
-        }
-        h1 {
-            font-family: serif;
-            font-size: 3rem;
-            padding: 10px;
-        }
-        h2 {
-            font-family: serif;
-            background-color: darkblue;
-            color: white;
-            font-size: 2rem;
-            padding: 10px;
-        }
-        h3 {
-            font-family: sans-serif;
-            font-size: 1.5rem;
-            padding: 10px;
-        }
-        h3 b {
-            background-color: lightyellow;
-            padding: 0 2px;
-        }
-        .graph {
-            padding: 20px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-        }
-        span.method {
-            background-color: bisque;
-        }
-        span.tid {
-            background-color: mistyrose;
-        }
-
-        .tree {
-            --spacing : 1.5rem;
-            --radius  : 10px;
-            text-align: left;
-        }
-        .tree li {
-            display      : block;
-            position     : relative;
-            padding-left : calc(2 * var(--spacing) - var(--radius) - 2px);
-        }
-        .tree ul {
-            margin-left  : calc(var(--radius) - var(--spacing));
-            padding-left : 0;
-        }
-        .tree ul li {
-            border-left : 2px solid #ddd;
-        }
-        .tree ul li:last-child {
-            border-color : transparent;
-        }
-        .tree ul li::before{
-            content      : '';
-            display      : block;
-            position     : absolute;
-            top          : calc(var(--spacing) / -2);
-            left         : -2px;
-            width        : calc(var(--spacing) + 2px);
-            height       : calc(var(--spacing) + 1px);
-            border       : solid #ddd;
-            border-width : 0 0 2px 2px;
-        }
-        .tree summary {
-            display : block;
-            cursor  : pointer;
-            padding : 6px 0;
-        }
-        .tree summary:hover {
-            background-color: #ddd;
-        }
-        .tree summary::marker,
-        .tree summary::-webkit-details-marker{
-            display : none;
-        }
-        .tree summary:focus{
-            outline : none;
-        }
-        .tree summary:focus-visible{
-            outline : 1px dotted #000;
-        }
-        .tree li::after,
-        .tree summary::before{
-            content       : '';
-            display       : block;
-            position      : absolute;
-            top           : calc(var(--spacing) / 2 - var(--radius));
-            left          : calc(var(--spacing) - var(--radius) - 1px);
-            width         : calc(2 * var(--radius));
-            height        : calc(2 * var(--radius));
-            border-radius : 50%;
-            background    : #ddd;
-        }
-        .tree summary::before{
-            margin-top: 4px;
-            z-index    : 1;
-            background : #696 url('expand-collapse.svg') 0 0;
-        }
-
-        .tree details[open] > summary::before{
-            background-position : calc(-2 * var(--radius)) 0;
-        }
-        header {
-            background-color: #333;
-            padding: 10px 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 100;
-        }
-        header a {
-            color: white;
-            text-decoration: none;
-            padding: 10px;
-            letter-spacing: -1px;
-        }
-        .styled-table {
-            border-collapse: collapse;
-            font-family: sans-serif;
-            min-width: 400px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-            margin: 25px auto;
-        }
-        .styled-table thead tr {
-            background-color: #009879;
-            color: #ffffff;
-            text-align: left;
-        }
-        .styled-table th,
-        .styled-table td {
-            padding: 12px 15px;
-            vertical-align: top;
-        }
-        .styled-table tbody tr {
-            border-bottom: 1px solid #dddddd;
-        }
-
-        .styled-table tbody tr:nth-of-type(even) {
-            background-color: #f3f3f3;
-        }
-        .styled-table tbody tr:last-of-type {
-            border-bottom: 2px solid #009879;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
@@ -341,9 +143,19 @@
         {% for ed in exceptions %}
             <div class="box box-wide">
                 <b>{{ ed.threadName }}</b> <span class="tid">{{ ed.threadId }}</span><br>
-                <p style="font-size: 0.8rem">
+                <p class="stacktrace">
                 {% for e in ed.exceptions %}{{ e }}<br>{% endfor %}
                 </p>
+                <a class="toggle" href="#" onclick="return toggleDiv('error_{{ loop.index }}')">stacktrace</a>
+                <div id="error_{{ loop.index }}" style="display: none; position: relative;" class="stacktrace">
+                        {% for s in ed.stacktrace %}
+                        {% if s containsOneOf ed.exceptions and s containsOneOf ['<init>'] %}
+                            <b>{{ s }}</b><br>
+                            {% else %}
+                            {{ s }}<br>
+                        {% endif %}
+                        {% endfor %}
+                </div>
             </div>
         {% endfor %}
             </div>
@@ -378,7 +190,7 @@
             <tr>
                 <td>{{ ust.name }}<br><span class="tid">{{ ust.tid }}</span></td>
                 <td>{{ ust.count }}</td>
-                <td style="font-size: 0.8rem">
+                <td class="stacktrace">
                     {{ ust.state }}<br>
                     {% for st in ust.stackTrace %}
                     {{ st }}<br>
@@ -445,5 +257,14 @@
             .datum(flamegraphData)
             .call(chart);
     };
+    function toggleDiv(id) {
+        const element = document.getElementById(id);
+        if (element.style.display === "none") {
+            element.style.display = "block";
+        } else {
+            element.style.display = "none";
+        }
+        return false;
+    }
 </script>
 </html>
