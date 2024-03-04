@@ -176,20 +176,18 @@
 
     <a id="ust"></a>
     <div class="block">
-        <h2>🪞Threads with identical stack trace (top 10)</h2>
+        <h2>🪞Threads with identical stack trace (up to 10)</h2>
         <div class="graph">
             <table class="styled-table">
             <thead>
             <tr>
-                <th>Thread</th>
                 <th>Count</th>
                 <th>Stack Trace</th>
             </tr>
             </thead>
             {% for ust in usts %}
             <tr>
-                <td>{{ ust.name }}<br><span class="tid">{{ ust.tid }}</span></td>
-                <td>{{ ust.count }}</td>
+                <td><b>{{ ust.count }}</b></td>
                 <td class="stacktrace">
                     {{ ust.state }}<br>
                     {% for st in ust.stackTrace %}

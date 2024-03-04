@@ -56,12 +56,10 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
             }
         context["usts"] =
             tda.uniqueStackTraces
-                .takeWhile { it.count > 10 }
-                .take(10)
+                .takeWhile { it.count >= 10 }
+//                .take(10)
                 .map {
                     ReportThreadStackFreq(it.threadInfo.name.toString(),
-                        it.threadInfo.tid.toString(),
-                        it.threadInfo.state.toString(),
                         it.count,
                         it.threadInfo.stackTrace.map { it.toString() })
                 }
