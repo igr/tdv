@@ -59,7 +59,7 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
                 .takeWhile { it.count >= 10 }
 //                .take(10)
                 .map {
-                    ReportThreadStackFreq(it.threadInfo.name.toString(),
+                    ReportThreadStackFreq(it.threadInfo.state.toString(),
                         it.count,
                         it.threadInfo.stackTrace.map { it.toString() })
                 }
