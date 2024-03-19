@@ -52,25 +52,21 @@ object ParseThreadDump : (String) -> ThreadDump {
 
 
 	private fun skipSMR(tdi: ThreadDumpIterator) {
+        fun detectSmr(line: String): Boolean {
+            return line.startsWith("_java_thread_list=")
+                || line.startsWith("_to_delete_list=")
+                || line.startsWith("next-> ")
+        }
 		tdi.skip()
-		tdi.peek().let {
-			if (it.startsWith("_java_thread_list=")) {
-				tdi.skipUntilMatch("}")
-				tdi.skip()
-			}
-		}
-		tdi.peek().let {
-			if (it.startsWith("_to_delete_list=")) {
-				tdi.skipUntilMatch("}")
-				tdi.skip()
-			}
-		}
-		tdi.peek().let {
-			if (it.startsWith("next-> ")) {
-				tdi.skipUntilMatch("}")
-				tdi.skip()
-			}
-		}
+
+        while (true) {
+            val nextLine = tdi.peek()
+            if (!detectSmr(nextLine)) {
+                break
+            }
+            tdi.skipUntilMatch("}")
+            tdi.skip()
+        }
 	}
 
 }
