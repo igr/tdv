@@ -11,10 +11,12 @@ data class BlockExplanation(
     val fileLine: Int,
     val blocking: Int,
     val threadName: String,
+    val threadId: String,
     val stuckClassName: String,
     val stuckMethodName: String,
     val stuckLine: Int,
-    val locksCount: Int
+    val locksCount: Int,
+    val stackTrace: List<String>
 ) {
     companion object {
         fun fromLockRef(blocker: LockRef, blocking: Int): BlockExplanation {
@@ -24,10 +26,16 @@ data class BlockExplanation(
                 fileLine = blocker.stackTraceElement.fileLine.toString().toInt(),
                 blocking = blocking,
                 threadName = blocker.thread.name.toString(),
+                threadId = blocker.thread.tid.toString(),
                 stuckClassName = blocker.thread.stackTrace[0].className.toString(),
                 stuckMethodName = blocker.thread.stackTrace[0].methodName.toString(),
                 stuckLine = blocker.thread.stackTrace[0].fileLine.toString().toInt(),
-                locksCount = blocker.thread.stackTrace.flatMap { it.locks }.count { it is Locked }
+                locksCount = blocker.thread.stackTrace.flatMap { it.locks }.count { it is Locked },
+                stackTrace = blocker.thread.stackTrace.map {
+                    it.toString() +
+                        if (it.locks.isEmpty()) "" else "<br>" + it.locks.joinToString("<br>") { it.toString() }
+
+                }
             )
         }
     }
