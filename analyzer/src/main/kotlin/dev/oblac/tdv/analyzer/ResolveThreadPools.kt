@@ -5,8 +5,8 @@ import dev.oblac.tdv.domain.ThreadName
 import dev.oblac.tdv.domain.ThreadPoolInfo
 import dev.oblac.tdv.domain.ThreadPoolName
 
-object ResolveThreadPools : (ThreadDump) -> List<ThreadPoolInfo> {
-    override fun invoke(td: ThreadDump): List<ThreadPoolInfo> {
+object ResolveThreadPools : (ThreadDump) -> List<ThreadPool> {
+    override fun invoke(td: ThreadDump): List<ThreadPool> {
         val map = mutableMapOf<ThreadPoolName, ThreadPoolInfo>()
 
         td.threads.forEach {
@@ -18,7 +18,9 @@ object ResolveThreadPools : (ThreadDump) -> List<ThreadPoolInfo> {
                 ThreadPoolInfo(threadPoolName, element.count + 1, element.threads + it)
         }
 
-        return map.values.sortedByDescending { it.count }.toList()
+        return map.values.sortedByDescending { it.count }.toList().map {
+            ThreadPool(it, CalculateAppStats(it.threads))
+        }
     }
 
     private fun resolveThreadPoolName(name: ThreadName): ThreadPoolName {

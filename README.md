@@ -81,7 +81,7 @@ Sort threads by CPU consumption.
 
 ## TODO
 
-+ [ ] Stats per thread pool
++ [X] Stats per thread pool
 + [ ] Deadlocks detection (as soon as I get a thread dump with a deadlock)
 + [ ] Detect complex deadlocks (e.g. A -> B -> C -> A)
 + [ ] Thread histogram per priorities

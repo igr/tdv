@@ -65,11 +65,15 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
                 }
         context["pools"] =
             tda.threadPools
-                .takeWhile { it.count >= 10 }
+                .takeWhile { it.info.count >= 10 }
                 .map {
                     ReportThreadGroup(
-                        it.name.toString(),
-                        it.count
+                        it.info.name.toString(),
+                        it.info.count,
+                        it.stats.runnableThreads,
+                        it.stats.blockedThreads,
+                        it.stats.waitingThreads,
+                        it.stats.timedWaitingThreads,
                     )
                 }
 

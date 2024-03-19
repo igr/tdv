@@ -2,8 +2,8 @@ package dev.oblac.tdv.analyzer
 
 import dev.oblac.tdv.domain.*
 
-internal object CalculateAppStats: (List<AppThreadInfo>) -> ThreadDumpStats {
-    override fun invoke(threads: List<AppThreadInfo>): ThreadDumpStats {
+internal object CalculateAppStats: (Collection<AppThreadInfo>) -> ThreadDumpStats {
+    override fun invoke(threads: Collection<AppThreadInfo>): ThreadDumpStats {
         val totalThreads = threads.size
 
         val blockedThreads = threads.count { it.state == ThreadState.BLOCKED }
@@ -58,8 +58,8 @@ internal object CalculateAppStats: (List<AppThreadInfo>) -> ThreadDumpStats {
     }
 }
 
-internal object CalculateSystemStats : (List<SystemThreadInfo>) -> ThreadDumpStats {
-    override fun invoke(systemThreads: List<SystemThreadInfo>): ThreadDumpStats {
+internal object CalculateSystemStats : (Collection<SystemThreadInfo>) -> ThreadDumpStats {
+    override fun invoke(systemThreads: Collection<SystemThreadInfo>): ThreadDumpStats {
         val totalThreads = systemThreads.size
         val blockedThreads = 0
         val newThreads = 0

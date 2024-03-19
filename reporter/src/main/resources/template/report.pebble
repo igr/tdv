@@ -114,12 +114,20 @@
                 <tr>
                     <th>Count</th>
                     <th>Thread Pool</th>
+                    <th>runnable</th>
+                    <th>blocked</th>
+                    <th>waiting</th>
+                    <th>timed_waiting</th>
                 </tr>
                 </thead>
                 {% for pool in pools %}
                 <tr>
                     <td><b>{{ pool.count }}</b></td>
                     <td>{{ pool.name }}</td>
+                    <td style="text-align: center">{{ pool.runnable }}</td>
+                    <td style="text-align: center">{{ pool.blocked }}</td>
+                    <td style="text-align: center">{{ pool.waiting }}</td>
+                    <td style="text-align: center">{{ pool.timedWaiting }}</td>
                 </tr>
             {% endfor %}
             </table>

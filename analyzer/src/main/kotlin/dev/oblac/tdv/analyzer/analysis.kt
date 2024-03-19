@@ -2,7 +2,6 @@ package dev.oblac.tdv.analyzer
 
 import dev.oblac.tdv.domain.AppThreadInfo
 import dev.oblac.tdv.domain.ThreadDump
-import dev.oblac.tdv.domain.ThreadPoolInfo
 
 data class ThreadDumpAnalysis(
     val threadDump: ThreadDump,
@@ -12,5 +11,5 @@ data class ThreadDumpAnalysis(
     val exceptions: List<AppThreadInfo>,
     val maxCpuThreads: List<CpuConsumingThread>,
     val uniqueStackTraces: List<StackTraceFrequency>,
-    val threadPools: List<ThreadPoolInfo>
+    val threadPools: List<ThreadPool>
 )
