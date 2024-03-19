@@ -2,7 +2,7 @@ package dev.oblac.tdv.domain
 
 sealed interface ThreadInfo
 
-data class JVMThreadInfo(
+data class AppThreadInfo(
 	val name: ThreadName,
 	val daemon: Daemon,
 	val number: ThreadNo,
@@ -33,5 +33,5 @@ data class SystemThreadInfo(
 data class ThreadPoolInfo(
     val name: ThreadPoolName,
     val count: Int,
-    val threads: Set<JVMThreadInfo>
+    val threads: Set<AppThreadInfo>
 )

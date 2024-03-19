@@ -14,16 +14,16 @@ internal object ParseThread : (ThreadDumpIterator) -> ThreadInfo {
 		val headerLine = tdi.next()
 		val detectLine = headerLine.substringAfter("\"").substringAfter("\"")
 		return if (detectLine.contains("#")) {
-			parseJVMThread(headerLine, tdi)
+			parseAppThread(headerLine, tdi)
 		} else {
 			parseSystemThread(headerLine, tdi)
 		}
 	}
 
-	private fun parseJVMThread(
+	private fun parseAppThread(
 		headerLine: String,
 		tdi: ThreadDumpIterator,
-	): JVMThreadInfo {
+	): AppThreadInfo {
 		val header = JVM_THREAD_HEADER_PARSE_REGEX.find(headerLine)?.groups
 			?: throw IllegalStateException("Invalid JVM thread header: $headerLine")
 
@@ -40,7 +40,7 @@ internal object ParseThread : (ThreadDumpIterator) -> ThreadInfo {
 
 		val stackTrace = ParseStackTrace(tdi)
 
-		return JVMThreadInfo(
+		return AppThreadInfo(
 			name = threadName,
 			number = threadNumber,
 			daemon = threadDaemon,

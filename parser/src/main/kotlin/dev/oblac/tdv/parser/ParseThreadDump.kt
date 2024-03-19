@@ -1,6 +1,6 @@
 package dev.oblac.tdv.parser
 
-import dev.oblac.tdv.domain.JVMThreadInfo
+import dev.oblac.tdv.domain.AppThreadInfo
 import dev.oblac.tdv.domain.SystemThreadInfo
 import dev.oblac.tdv.domain.ThreadDump
 import java.time.LocalDateTime
@@ -24,7 +24,7 @@ object ParseThreadDump : (String) -> ThreadDump {
 
 		tdi.skip()
 
-		val threads = mutableListOf<JVMThreadInfo>()
+		val threads = mutableListOf<AppThreadInfo>()
 		val sysThreads = mutableListOf<SystemThreadInfo>()
 
 		// parse threads
@@ -34,7 +34,7 @@ object ParseThreadDump : (String) -> ThreadDump {
 			}
 			ParseThread(tdi).run {
 				when (this) {
-					is JVMThreadInfo -> threads.add(this)
+					is AppThreadInfo -> threads.add(this)
 					is SystemThreadInfo -> sysThreads.add(this)
 				}
 			}
