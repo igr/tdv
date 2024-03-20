@@ -20,6 +20,6 @@ application {
 tasks {
     named<ShadowJar>("shadowJar") {
         archiveBaseName.set("tdv")
-        archiveVersion.set("0.3.0")
+        archiveVersion.set("0.4.0")
     }
 }
