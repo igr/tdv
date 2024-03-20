@@ -13,6 +13,7 @@ object AnalyzeThreadDump : (ThreadDump) -> ThreadDumpAnalysis {
             maxCpuThreads = FindTopCpuThreads(td, 10),
             uniqueStackTraces = GroupUniqueStackTraces(td),
             threadPools = ResolveThreadPools(td),
+            tomcatAnalysis = AnalyzeTomcat(td),
         )
 	}
 }

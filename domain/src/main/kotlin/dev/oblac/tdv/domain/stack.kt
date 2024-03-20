@@ -5,6 +5,13 @@ value class ClassName(private val value: String) {
     override fun toString() = value
     fun isJavaException() = value == "java.lang.Throwable" || value == "java.lang.Exception"
     fun isAnyException() = value.contains("Throwable") || value.contains("Exception")
+
+    /**
+     * Returns true if the class name contains the given substring.
+     */
+    fun contains(substring: String): Boolean {
+        return value.contains(substring)
+    }
 }
 
 @JvmInline

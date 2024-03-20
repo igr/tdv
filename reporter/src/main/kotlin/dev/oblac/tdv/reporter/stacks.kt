@@ -5,3 +5,10 @@ data class ReportThreadStackFreq(
     val count: Int,
     val stackTrace: List<String>
 )
+
+data class ReportThreadStack(
+    val name: String,
+    val threadId: String,
+    val state: String,
+    val stackTrace: List<String>
+)

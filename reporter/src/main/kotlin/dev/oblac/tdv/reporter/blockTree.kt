@@ -50,8 +50,7 @@ data class ReportBlockNode(
         fun fromBlockNode(blockNode: BlockNode): ReportBlockNode {
             return ReportBlockNode(
                 name = blockNode.blocker.thread.name,
-                popup = blockNode.blocker.thread.name.toString() + "\n" +
-                        blockNode.blocker.thread.stackTrace[0].toString(),
+                popup = blockNode.blocker.thread.tid.toString(),
                 children = blockNode.blocked.map { fromBlockNode(it) }
             )
         }

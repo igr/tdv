@@ -1,18 +1,21 @@
-{# @pebvariable name="td" type="dev.oblac.tdv.domain.ThreadDump" #}
+{# @pebvariable name="td" type="java.util.List<dev.oblac.tdv.reporter.ReportThreadStack>" #}
 {# @pebvariable name="stats" type="dev.oblac.tdv.analyzer.ThreadDumpStats" #}
+{# @pebvariable name="tomcat" type="dev.oblac.tdv.analyzer.TomcatAnalysis" #}
 {# @pebvariable name="blockTree" type="dev.oblac.tdv.analyzer.BlockTree" #}
 {# @pebvariable name="ex" type="dev.oblac.tdv.reporter.BlockExplanation" #}
+    {% import "./macros.pebble" %}
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thread Dump : {{ td.date }}</title>
+    <title>Thread Dump : {{ tdDate }}</title>
     <link href="d3-flamegraph.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
     <a href="#threads">Threads</a>
+    {% if tomcat.stats.totalThreads != 0 %}<a href="#tomcat">Tomcat</a>{% endif %}
     <a href="#daemons">Daemons</a>
     <a href="#gc">GC threads</a>
     <a href="#pools">Pools</a>
@@ -22,44 +25,29 @@
     <a href="#exceptions">Exceptions</a>
     <a href="#cpu">CPU consuming</a>
     <a href="#ust">Identical stack trace</a>
+    <a href="#all">All Threads</a>
 </header>
 <main id="content">
-    <h1>{{ td.date }}</h1>
-    <div>{{ td.name }}</div>
+    <h1>{{ tdDate }}</h1>
+    <div>{{ tdName }}</div>
 
     <a id="threads"></a>
     <div class="block">
         <h2>🧵 Threads</h2>
-        <div class="grid21">
-            <div class="boxes">
-                <div class="box">
-                    <div class="box-title">TOTAL</div>
-                    <div class="box-value">{{ stats.totalThreads }}</div>
-                </div>
-                <div class="box">
-                    <div class="box-title">TERMINATED</div>
-                    <div class="box-value">{{ stats.terminatedThreads }}</div>
-                </div>
-                <div class="box">
-                    <div class="box-title">RUNNABLE</div>
-                    <div class="box-value">{{ stats.runnableThreads }}</div>
-                </div>
-                <div class="box">
-                    <div class="box-title">BLOCKED</div>
-                    <div class="box-value">{{ stats.blockedThreads }}</div>
-                </div>
-                <div class="box">
-                    <div class="box-title">TIMED_WAITING</div>
-                    <div class="box-value">{{ stats.timedWaitingThreads }}</div>
-                </div>
-                <div class="box">
-                    <div class="box-title">WAITING</div>
-                    <div class="box-value">{{ stats.waitingThreads }}</div>
-                </div>
-            </div>
-            <div id="chart_threads" style="width:600px;height:500px;"></div>
-        </div>
+        {{ threadStats(stats, "all") }}
     </div>
+
+    {% if tomcat.stats.totalThreads != 0 %}
+        <a id="tomcat"></a>
+        <div class="block">
+            <h2>😸 Tomcat threads</h2>
+            {{ threadStats(tomcat.stats, "tomcat") }}
+        </div>
+        <div class="block">
+            <h3>Tomcat Executors pool</h3>
+            {{ threadStats(tomcat.tomcatExecutors, "tomcat_exec") }}
+        </div>
+    {% endif %}
 
     <a id="daemons"></a>
     <div class="block">
@@ -121,15 +109,15 @@
                 </tr>
                 </thead>
                 {% for pool in pools %}
-                <tr>
-                    <td><b>{{ pool.count }}</b></td>
-                    <td>{{ pool.name }}</td>
-                    <td style="text-align: center">{{ pool.runnable }}</td>
-                    <td style="text-align: center">{{ pool.blocked }}</td>
-                    <td style="text-align: center">{{ pool.waiting }}</td>
-                    <td style="text-align: center">{{ pool.timedWaiting }}</td>
-                </tr>
-            {% endfor %}
+                    <tr>
+                        <td><b>{{ pool.count }}</b></td>
+                        <td>{{ pool.name }}</td>
+                        <td style="text-align: center">{{ pool.runnable }}</td>
+                        <td style="text-align: center">{{ pool.blocked }}</td>
+                        <td style="text-align: center">{{ pool.waiting }}</td>
+                        <td style="text-align: center">{{ pool.timedWaiting }}</td>
+                    </tr>
+                {% endfor %}
             </table>
         </div>
     </div>
@@ -139,22 +127,28 @@
         <h2>🛑 Blocks</h2>
         {% for blockNode in blockTree %}
             {% set ex = explain.get(loop.index) %}
-            <h3>The method <b>{{ ex.className }}.<span class="method">{{ ex.methodName }}</span></b> (line #{{ ex.fileLine }}) is blocking <b>{{ ex.blocking }}</b> threads.</h3>
-            <p><b>{{ ex.threadName }}</b> thread (<span class="tid">{{ex.threadId}}</span>) is stuck on <b>{{ ex.stuckClassName }}.{{ ex.stuckMethodName }}</b> (line #{{ ex.stuckLine }}).<br>
+            <h3>The method <b>{{ ex.className }}.<span class="method">{{ ex.methodName }}</span></b> (line
+                #{{ ex.fileLine }}) is blocking <b>{{ ex.blocking }}</b> threads.</h3>
+            <p><b>{{ ex.threadName }}</b> thread (<span class="tid">{{ex.threadId}}</span>) is stuck on
+                <b>{{ ex.stuckClassName }}.{{ ex.stuckMethodName }}</b> (line #{{ ex.stuckLine }}).<br>
                 Before getting stuck, this thread obtained <b>{{ ex.locksCount }}</b> locks and never released it.<br>
                 Due to that, <b>{{ ex.blocking }}</b> threads are BLOCKED as shown in the below graph.</p>
             <details>
                 <summary>Stacktrace</summary>
-                <table class="styled-table"><tr><td class="stacktrace">
-                    {% for st in ex.stackTrace %}
-                    {{ st | raw}}<br>
-                    {% endfor %}
-                </td></tr></table>
+                <table class="styled-table">
+                    <tr>
+                        <td class="stacktrace">
+                                {% for st in ex.stackTrace %}
+                                {{ st | raw}}<br>
+                                {% endfor %}
+                        </td>
+                    </tr>
+                </table>
             </details>
 
-        <div class="graph">
-            <div id="blockTree_{{ loop.index }}"></div>
-        </div>
+            <div class="graph">
+                <div id="blockTree_{{ loop.index }}"></div>
+            </div>
         {% endfor %}
     </div>
 
@@ -170,7 +164,7 @@
     <div class="block">
         <h2>☎️ Call Tree</h2>
         <div class="graph">
-        {{ callgraph | raw }}
+                {{ callgraph | raw }}
         </div>
     </div>
 
@@ -179,24 +173,24 @@
         <h2>🚨 Exceptions</h2>
         <div class="graph" style="text-align: left">
             <div class="boxes">
-        {% for ed in exceptions %}
-            <div class="box box-wide">
-                <b>{{ ed.threadName }}</b> <span class="tid">{{ ed.threadId }}</span><br>
-                <p class="stacktrace">
-                {% for e in ed.exceptions %}{{ e }}<br>{% endfor %}
-                </p>
-                <a class="toggle" href="#" onclick="return toggleDiv('error_{{ loop.index }}')">stacktrace</a>
-                <div id="error_{{ loop.index }}" style="display: none; position: relative;" class="stacktrace">
-                        {% for s in ed.stacktrace %}
-                        {% if s containsOneOf ed.exceptions and s containsOneOf ['<init>'] %}
-                            <b>{{ s }}</b><br>
-                            {% else %}
-                            {{ s }}<br>
-                        {% endif %}
-                        {% endfor %}
-                </div>
-            </div>
-        {% endfor %}
+                    {% for ed in exceptions %}
+                    <div class="box box-wide">
+                        <b>{{ ed.threadName }}</b> <span class="tid">{{ ed.threadId }}</span><br>
+                        <p class="stacktrace">
+                                {% for e in ed.exceptions %}{{ e }}<br>{% endfor %}
+                        </p>
+                        <a class="toggle" href="#" onclick="return toggleDiv('error_{{ loop.index }}')">stacktrace</a>
+                        <div id="error_{{ loop.index }}" style="display: none; position: relative;" class="stacktrace">
+                                {% for s in ed.stacktrace %}
+                                {% if s containsOneOf ed.exceptions and s containsOneOf ['<init>'] %}
+                                    <b>{{ s }}</b><br>
+                                    {% else %}
+                                    {{ s }}<br>
+                                {% endif %}
+                                {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
             </div>
         </div>
     </div>
@@ -205,11 +199,12 @@
     <div class="block">
         <h2>🍪 CPU consuming threads</h2>
         <div class="graph" style="text-align: left">
-        {% for c in cpuc %}
-        <p>
-            [{{ c.percentage | numberformat('#.##') }}%] <b>{{ c.threadName }}</b> <span class="tid">{{ c.threadId }}</span><br>
-        </p>
-        {% endfor %}
+                {% for c in cpuc %}
+                <p>
+                    [{{ c.percentage | numberformat('#.##') }}%] <b>{{ c.threadName }}</b> <span
+                    class="tid">{{ c.threadId }}</span><br>
+                </p>
+                {% endfor %}
         </div>
     </div>
 
@@ -218,25 +213,44 @@
         <h2>🪞Threads with identical stack trace (up to 10)</h2>
         <div class="graph">
             <table class="styled-table">
-            <thead>
-            <tr>
-                <th>Count</th>
-                <th>Stack Trace</th>
-            </tr>
-            </thead>
-            {% for ust in usts %}
-            <tr>
-                <td><b>{{ ust.count }}</b></td>
-                <td class="stacktrace">
-                    {{ ust.state }}<br>
-                    {% for st in ust.stackTrace %}
-                    {{ st }}<br>
-                    {% endfor %}
-                </td>
-            </tr>
-            {% endfor %}
+                <thead>
+                <tr>
+                    <th>Count</th>
+                    <th>Stack Trace</th>
+                </tr>
+                </thead>
+                {% for ust in usts %}
+                    <tr>
+                        <td><b>{{ ust.count }}</b></td>
+                        <td class="stacktrace">
+                            {{ ust.state }}<br>
+                            {% for st in ust.stackTrace %}
+                            {{ st }}<br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
             </table>
         </div>
+    </div>
+    <a id="all"></a>
+    <div class="block">
+        <h2>🔥ALL Threads</h2>
+        {% for t in td %}
+        <a id="tid_{{ t.threadId }}"></a>
+        <div>
+            <a class="toggle" href="#" onclick="return toggleDiv('thread_{{ t.threadId }}')">{{ t.name }} <span class="tid">{{ t.threadId }}</span></a>
+            <table id="thread_{{ t.threadId }}" class="styled-table" style="display: none">
+                <tr>
+                    <td class="stacktrace">
+                        {% for st in t.stackTrace %}
+                            {{ st | raw}}<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        {% endfor %}
     </div>
 </main>
 
@@ -248,45 +262,44 @@
 <script src="tree.js"></script>
 <script type="text/javascript" src="d3-flamegraph.min.js"></script>
 <script>
-    const threadsData = [
-        {"name": "TERMINATED", y:{{ stats.terminatedThreadsPercent | numberformat("#.##") }} },
-        {"name": "BLOCKED", y:{{ stats.blockedThreadsPercent | numberformat("#.##") }} },
-        {"name": "WAITING", y:{{ stats.waitingThreadsPercent | numberformat("#.##") }} },
-        {"name": "RUNNABLE", y:{{ stats.runnableThreadsPercent | numberformat("#.##") }} },
-        {"name": "TIMED_WAITING", y:{{ stats.timedWaitingThreadsPercent | numberformat("#.##") }} },
-    ];
     const daemonsData = [
         {"name": "DAEMON", y:{{ stats.daemonCountPercent | numberformat("#.##") }} },
         {"name": "NON-DAEMON", y:{{ stats.nonDaemonCountPercent | numberformat("#.##") }} },
     ]
     const gcStats = [
-        { label: "Worker", y:{{ stats.gcWorkerThreadsPercent | numberformat("#.##") }} },
-        { label: "Concurrent", y:{{ stats.gcConcurrentThreadsPercent | numberformat("#.##") }} },
-        { label: "Refine", y:{{ stats.gcRefineThreadsPercent | numberformat("#.##") }} },
+        {label: "Worker", y:{{ stats.gcWorkerThreadsPercent | numberformat("#.##") }} },
+        {label: "Concurrent", y:{{ stats.gcConcurrentThreadsPercent | numberformat("#.##") }} },
+        {label: "Refine", y:{{ stats.gcRefineThreadsPercent | numberformat("#.##") }} },
     ]
 
-    {% for blockNode in blockTree %}
-    const blockTree_{{ loop.index }} = {{ blockNode | json | raw }};
-    {% endfor %}
+        {% for blockNode in blockTree %}
+        const blockTree_{{ loop.index }} = {{ blockNode | json | raw }};
+        {% endfor %}
 
     const flamegraphData = {{ flamegraph | json | raw }};
 
     window.onload = function () {
-        drawThreadsPieChar("chart_threads", "Thread state %", threadsData);
+        {{ threadStatsPiechart(stats, "all") }}
+        {% if tomcat.stats.totalThreads != 0 %}
+        {{ threadStatsPiechart(tomcat.stats, "tomcat") }}
+        {{ threadStatsPiechart(tomcat.tomcatExecutors, "tomcat_exec") }}
+        {% endif %}
         drawThreadsPieChar("chart_daemons", "Daemon vs Non-Daemon %", daemonsData);
         drawThreadsPieChar("chart_gc", "GC threads %", gcStats);
 
         {% for blockNode in blockTree %}
-        const blockTreeChart_{{ loop.index }} = Tree(blockTree_{{ loop.index }}, {
-            label: d => d.name,
-            title: (d, n) => `${n.data.popup}`, // hover text
-            r: 8,
-            fontSize: 14,
-            deltaX: 30,
-            fill: "red",
-            width: 1200
-        })
-        document.getElementById("blockTree_{{ loop.index }}").appendChild(blockTreeChart_{{ loop.index }});
+            const blockTreeChart_{{ loop.index }} = Tree(blockTree_{{ loop.index }}, {
+                label: d => d.name,
+                title: (d, n) => `${n.data.popup}`, // hover text
+                link: d => `#tid_${d.popup}`,
+                linkTarget: "_self",
+                r: 8,
+                fontSize: 14,
+                deltaX: 30,
+                fill: "red",
+                width: 1200
+            })
+            document.getElementById("blockTree_{{ loop.index }}").appendChild(blockTreeChart_{{ loop.index }});
         {% endfor %}
 
         const chart = flamegraph().width(1200);
@@ -294,6 +307,7 @@
             .datum(flamegraphData)
             .call(chart);
     };
+
     function toggleDiv(id) {
         const element = document.getElementById(id);
         if (element.style.display === "none") {

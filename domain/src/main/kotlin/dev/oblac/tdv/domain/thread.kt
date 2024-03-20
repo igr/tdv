@@ -11,6 +11,7 @@ value class ThreadNo(private val value: Int) {
 @JvmInline
 value class ThreadName(private val value: String) {
     override fun toString() = value
+    fun contains(substring: String) = value.contains(substring)
 }
 
 @JvmInline

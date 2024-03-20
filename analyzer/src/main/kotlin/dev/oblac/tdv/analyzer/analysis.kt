@@ -11,5 +11,6 @@ data class ThreadDumpAnalysis(
     val exceptions: List<AppThreadInfo>,
     val maxCpuThreads: List<CpuConsumingThread>,
     val uniqueStackTraces: List<StackTraceFrequency>,
-    val threadPools: List<ThreadPool>
+    val threadPools: List<ThreadPool>,
+    val tomcatAnalysis: TomcatAnalysis,
 )

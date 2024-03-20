@@ -28,6 +28,10 @@ The report will contain the following sections:
 
 ![](doc/1-stats.png)
 
+### 😸 Tomcat
+
+If Tomcat is detected, there will be a section with Tomcat stats.
+
 ### 😈 Daemon stats
 
 ![](doc/2-daemon.png)

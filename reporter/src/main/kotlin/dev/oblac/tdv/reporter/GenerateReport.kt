@@ -18,8 +18,10 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
 
         val context: MutableMap<String, Any> = HashMap()
 
-        context["td"] =
-            td
+        context["tdName"] =
+            td.name
+        context["tdDate"] =
+            td.date
         context["stats"] =
             tda.stats
         context["blockTree"] =
@@ -76,6 +78,18 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
                         it.stats.timedWaitingThreads,
                     )
                 }
+        context["tomcat"] = tda.tomcatAnalysis
+        context["td"] = td.threads.map {
+            ReportThreadStack(
+                it.name.toString(),
+                it.tid.toString(),
+                it.state.toString(),
+                it.stackTrace.map { st ->
+                    val lock = st.locks.joinToString { it.toString() }
+                    st.toString() + (if (lock.isNotEmpty()) "<br>$lock" else "")
+                }
+            )
+        }.sortedBy { it.name }
 
         val writer = StringWriter()
         compiledTemplate.evaluate(writer, context)

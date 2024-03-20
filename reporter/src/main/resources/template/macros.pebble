@@ -1,0 +1,42 @@
+{% macro threadStats(stats, id) %}
+	<div class="grid21">
+            <div class="boxes">
+                <div class="box">
+                    <div class="box-title">TOTAL</div>
+                    <div class="box-value">{{ stats.totalThreads }}</div>
+                </div>
+                <div class="box">
+                    <div class="box-title">TERMINATED</div>
+                    <div class="box-value">{{ stats.terminatedThreads }}</div>
+                </div>
+                <div class="box runnable">
+                    <div class="box-title">RUNNABLE</div>
+                    <div class="box-value">{{ stats.runnableThreads }}</div>
+                </div>
+                <div class="box blocked">
+                    <div class="box-title">BLOCKED</div>
+                    <div class="box-value">{{ stats.blockedThreads }}</div>
+                </div>
+                <div class="box waiting">
+                    <div class="box-title">TIMED_WAITING</div>
+                    <div class="box-value">{{ stats.timedWaitingThreads }}</div>
+                </div>
+                <div class="box waiting">
+                    <div class="box-title">WAITING</div>
+                    <div class="box-value">{{ stats.waitingThreads }}</div>
+                </div>
+            </div>
+            <div id="chart_threads_{{ id }}" style="width:600px;height:500px;"></div>
+        </div>
+{% endmacro %}
+
+{% macro threadStatsPiechart(stats, id) %}
+    const threadsData_{{ id }} = [
+        {"name": "TERMINATED", y:{{ stats.terminatedThreadsPercent | numberformat("#.##") }} },
+        {"name": "BLOCKED", y:{{ stats.blockedThreadsPercent | numberformat("#.##") }} },
+        {"name": "WAITING", y:{{ stats.waitingThreadsPercent | numberformat("#.##") }} },
+        {"name": "RUNNABLE", y:{{ stats.runnableThreadsPercent | numberformat("#.##") }} },
+        {"name": "TIMED_WAITING", y:{{ stats.timedWaitingThreadsPercent | numberformat("#.##") }} },
+    ];
+    drawThreadsPieChar("chart_threads_{{ id }}", "Thread state %", threadsData_{{ id }});
+{% endmacro %}
