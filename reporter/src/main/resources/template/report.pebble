@@ -306,6 +306,15 @@
         d3.select("#flamechart")
             .datum(flamegraphData)
             .call(chart);
+
+        // detect threadId
+        if (window.location.hash.startsWith("#tid_")) {
+            const tid = window.location.hash.substring(5);
+            const id = "thread_" + tid;
+            toggleDiv(id);
+            document.getElementById(id).scrollIntoView();
+        }
+        console.log("TDV");
     };
 
     function toggleDiv(id) {
