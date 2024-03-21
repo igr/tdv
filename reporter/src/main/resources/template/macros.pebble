@@ -1,3 +1,4 @@
+{# @pebvariable name="ts" type="dev.oblac.tdv.reporter.ReportThreadStack" #}
 {% macro threadStats(stats, id) %}
 	<div class="grid21">
             <div class="boxes">
@@ -39,4 +40,19 @@
         {"name": "TIMED_WAITING", y:{{ stats.timedWaitingThreadsPercent | numberformat("#.##") }} },
     ];
     drawThreadsPieChar("chart_threads_{{ id }}", "Thread state %", threadsData_{{ id }});
+{% endmacro %}
+
+{% macro threadStack(ts) %}
+<table class="styled-table">
+    <thead><tr>
+        <th><span class="tid">{{ ts.threadId }}</span> {{ ts.name }} {{ ts.state }}</th>
+    </tr></thead>
+    <tr>
+    <td class="stacktrace {{ ts.state | lower }}">
+    {% for st in ts.stackTrace %}
+        {{ st | raw}}<br>
+    {% endfor %}
+    </td>
+    </tr>
+</table>
 {% endmacro %}

@@ -124,6 +124,8 @@ span.method {
 }
 span.tid {
     background-color: mistyrose;
+    color: black;
+    padding: 0 4px;
 }
 .stacktrace {
     font-size: 0.8em;

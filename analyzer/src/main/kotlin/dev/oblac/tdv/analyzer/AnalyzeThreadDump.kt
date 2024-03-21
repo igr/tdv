@@ -10,7 +10,7 @@ object AnalyzeThreadDump : (ThreadDump) -> ThreadDumpAnalysis {
             blockTree = DetectBlocks(td),
             callTree = MakeCallTree(td),
             exceptions = FilterExceptionThreads(td),
-            maxCpuThreads = FindTopCpuThreads(td, 10),
+            maxCpuThreads = FindTopCpuThreads(td, 20),
             uniqueStackTraces = GroupUniqueStackTraces(td),
             threadPools = ResolveThreadPools(td),
             tomcatAnalysis = AnalyzeTomcat(td),

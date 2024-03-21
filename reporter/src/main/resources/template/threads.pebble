@@ -9,9 +9,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-&nbsp;
-</header>
 <main id="content">
     <h1>{{ tdDate }}</h1>
     <div>{{ tdName }}</div>
@@ -21,17 +18,11 @@
         <h2>🔥ALL Threads</h2>
         {% for t in td %}
         <a id="tid_{{ t.threadId }}"></a>
-        <div class="{{ t.state | lower }}">
+        <div>
             <a class="toggle" href="#" onclick="return toggleDiv('thread_{{ t.threadId }}')">{{ t.name }} <span class="tid">{{ t.threadId }}</span> {{ t.state }}</a>
-            <table id="thread_{{ t.threadId }}" class="styled-table" style="display: none">
-                <tr>
-                    <td class="stacktrace">
-                        {% for st in t.stackTrace %}
-                        {{ st | raw}}<br>
-                        {% endfor %}
-                    </td>
-                </tr>
-            </table>
+            <div id="thread_{{ t.threadId }}" style="display: none">
+            {{ threadStack(t) }}
+            </div>
         </div>
         {% endfor %}
     </div>
