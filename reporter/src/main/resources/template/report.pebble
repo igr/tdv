@@ -129,7 +129,7 @@
         {% for blockNode in blockTree %}
             {% set ex = explain.get(loop.index) %}
             <h3>The method <b>{{ ex.className }}.<span class="method">{{ ex.methodName }}</span></b> (line
-                #{{ ex.fileLine }}) is blocking <b>{{ ex.blocking }}</b> threads.</h3>
+                #{{ ex.fileLine }}) is blocking {{ ex.blocking }} threads.</h3>
             <p><b>{{ ex.threadName }}</b> thread (<span class="tid">{{ex.threadId}}</span>) is stuck on
                 <b>{{ ex.stuckClassName }}.{{ ex.stuckMethodName }}</b> (line #{{ ex.stuckLine }}).<br>
                 Before getting stuck, this thread obtained <b>{{ ex.locksCount }}</b> locks and never released it.<br>

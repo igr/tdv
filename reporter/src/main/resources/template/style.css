@@ -110,13 +110,13 @@ a.toggle:hover {
 /*** THREAD ***/
 
 .runnable {
-    background-color: #cefad0;
+    background-color: #C8E6C9;
 }
 .blocked {
-    background-color: #ffbbbb;
+    background-color: #FFCDD2;
 }
 .timed_waiting, .waiting {
-    background-color: #d5cdf3;
+    background-color: #E1BEE7;
 }
 
 span.method {
