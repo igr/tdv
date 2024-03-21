@@ -19,9 +19,8 @@ data class ReportThreadStack(
             threadInfo.name.toString(),
             threadInfo.tid.toString(),
             threadInfo.state.toString(),
-            threadInfo.stackTrace.map { st ->
-                val lock = st.locks.joinToString { it.toString() }
-                st.toString() + (if (lock.isNotEmpty()) "<br>$lock" else "")
+            threadInfo.stackTrace.flatMap { st ->
+                listOf(st.toString().trim()) + st.locks.map { it.toString() }
             }
         )
     }

@@ -50,7 +50,11 @@
     <tr>
     <td class="stacktrace {{ ts.state | lower }}">
     {% for st in ts.stackTrace %}
-        {{ st | raw}}<br>
+        {% if st.startsWith("at ") %}
+            {{ st }}<br>
+        {% else %}
+            &nbsp; &nbsp;-&nbsp;{{ st }}<br>
+        {% endif %}
     {% endfor %}
     </td>
     </tr>
