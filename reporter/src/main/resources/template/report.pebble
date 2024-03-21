@@ -1,14 +1,15 @@
-{# @pebvariable name="td" type="java.util.List<dev.oblac.tdv.reporter.ReportThreadStack>" #}
+{# @pebvariable name="reportName" type="java.lang.String" #}
+{# @pebvariable name="tdName" type="java.lang.String" #}
 {# @pebvariable name="stats" type="dev.oblac.tdv.analyzer.ThreadDumpStats" #}
 {# @pebvariable name="tomcat" type="dev.oblac.tdv.analyzer.TomcatAnalysis" #}
 {# @pebvariable name="blockTree" type="dev.oblac.tdv.analyzer.BlockTree" #}
 {# @pebvariable name="ex" type="dev.oblac.tdv.reporter.BlockExplanation" #}
-    {% import "./macros.pebble" %}
+{% import "./macros.pebble" %}
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thread Dump : {{ tdDate }}</title>
+    <title>Thread Dump Report: {{ tdDate }}</title>
     <link href="d3-flamegraph.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -25,7 +26,7 @@
     <a href="#exceptions">Exceptions</a>
     <a href="#cpu">CPU consuming</a>
     <a href="#ust">Identical stack trace</a>
-    <a href="#all">All Threads</a>
+    <a href="{{ reportThreadsName }}">All Threads</a>
 </header>
 <main id="content">
     <h1>{{ tdDate }}</h1>
@@ -233,25 +234,6 @@
             </table>
         </div>
     </div>
-    <a id="all"></a>
-    <div class="block">
-        <h2>🔥ALL Threads</h2>
-        {% for t in td %}
-        <a id="tid_{{ t.threadId }}"></a>
-        <div>
-            <a class="toggle" href="#" onclick="return toggleDiv('thread_{{ t.threadId }}')">{{ t.name }} <span class="tid">{{ t.threadId }}</span></a>
-            <table id="thread_{{ t.threadId }}" class="styled-table" style="display: none">
-                <tr>
-                    <td class="stacktrace">
-                        {% for st in t.stackTrace %}
-                            {{ st | raw}}<br>
-                        {% endfor %}
-                    </td>
-                </tr>
-            </table>
-        </div>
-        {% endfor %}
-    </div>
 </main>
 
 <footer>🚀 TDV</footer>
@@ -291,8 +273,8 @@
             const blockTreeChart_{{ loop.index }} = Tree(blockTree_{{ loop.index }}, {
                 label: d => d.name,
                 title: (d, n) => `${n.data.popup}`, // hover text
-                link: d => `#tid_${d.popup}`,
-                linkTarget: "_self",
+                link: d => `{{ reportThreadsName }}#tid_${d.popup}`,
+                // linkTarget: "_self",
                 r: 8,
                 fontSize: 14,
                 deltaX: 30,
@@ -306,15 +288,6 @@
         d3.select("#flamechart")
             .datum(flamegraphData)
             .call(chart);
-
-        // detect threadId
-        if (window.location.hash.startsWith("#tid_")) {
-            const tid = window.location.hash.substring(5);
-            const id = "thread_" + tid;
-            toggleDiv(id);
-            document.getElementById(id).scrollIntoView();
-        }
-        console.log("TDV");
     };
 
     function toggleDiv(id) {

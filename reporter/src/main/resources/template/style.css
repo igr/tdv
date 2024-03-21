@@ -115,7 +115,7 @@ a.toggle:hover {
 .blocked {
     background-color: #ffbbbb;
 }
-.waiting {
+.timed_waiting, .waiting {
     background-color: #d5cdf3;
 }
 

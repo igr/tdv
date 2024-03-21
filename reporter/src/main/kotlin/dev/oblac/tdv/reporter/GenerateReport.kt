@@ -14,10 +14,18 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
             .extension(JsonWriterPebbleExtension())
             .extension(StringContainsOneOf())
             .build()
-        val compiledTemplate = engine.getTemplate("template/report.pebble")
+
+        val compiledTemplateReport = engine.getTemplate("template/report.pebble")
+        val compiledTemplateThreads = engine.getTemplate("template/threads.pebble")
+        val reportName = "report-${name}.html"
+        val reportThreadsName = "report-${name}-td.html"
 
         val context: MutableMap<String, Any> = HashMap()
 
+        context["reportName"] =
+            reportName
+        context["reportThreadsName"] =
+            reportThreadsName
         context["tdName"] =
             td.name
         context["tdDate"] =
@@ -91,12 +99,13 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
             )
         }.sortedBy { it.name }
 
-        val writer = StringWriter()
-        compiledTemplate.evaluate(writer, context)
+        val writerReport = StringWriter().also { compiledTemplateReport.evaluate(it, context) }
+        val writerThreads = StringWriter().also { compiledTemplateThreads.evaluate(it, context) }
 
         return Report(
             listOf(
-                ReportFile("report-${name}.html", writer.toString()),
+                ReportFile(reportName, writerReport.toString()),
+                ReportFile(reportThreadsName, writerThreads.toString()),
                 ResourceFile("style.css").toReportFile(),
                 ResourceFile("canvasjs.min.js").toReportFile(),
                 ResourceFile("d3.v7.min.js").toReportFile(),
