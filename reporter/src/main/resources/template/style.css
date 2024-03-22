@@ -114,6 +114,18 @@ a.toggle:hover {
     color: white;
 }
 
+.description:before {
+    content:"ℹ️";
+    padding-right: 5px;
+}
+.description {
+    color: #666;
+    margin: 0 20%;
+}
+.description b {
+    color: #6e2919;
+}
+
 /*** THREAD ***/
 
 .runnable {

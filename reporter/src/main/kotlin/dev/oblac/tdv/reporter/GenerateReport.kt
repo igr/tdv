@@ -82,8 +82,18 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
                         it.stats.timedWaitingThreads,
                     )
                 }
-        context["tomcat"] = tda.tomcatAnalysis
-        context["td"] = td.threads.map { ReportThreadStack.of(it) }.sortedBy { it.name }
+        context["tomcat"] =
+            tda.tomcatAnalysis
+        context["td"] =
+            td.threads.map { ReportThreadStack.of(it) }.sortedBy { it.name }
+        context["missing"] =
+            tda.missingLocks.parked.map {
+                ReportMissingData(
+                        it.missingLock.toString(),
+                        it.locks.count()
+                    )
+                }.filter { it.count > 10 }
+
 
         val writerReport = StringWriter().also { compiledTemplateReport.evaluate(it, context) }
         val writerThreads = StringWriter().also { compiledTemplateThreads.evaluate(it, context) }

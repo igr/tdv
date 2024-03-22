@@ -13,4 +13,5 @@ data class ThreadDumpAnalysis(
     val uniqueStackTraces: List<StackTraceFrequency>,
     val threadPools: List<ThreadPool>,
     val tomcatAnalysis: TomcatAnalysis,
+    val missingLocks: MissingLocks,
 )

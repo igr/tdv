@@ -24,7 +24,7 @@ It is a huge report, and it is not beautiful, but it is functional.
 
 The report will contain the following sections:
 
-> ⚠️ The screenshots are NOT up-to-date!
+> ⚠️ The screenshots are NOT up-to-date and may be missing.
 
 ### 🧵 Threads stats
 

@@ -14,6 +14,7 @@ object AnalyzeThreadDump : (ThreadDump) -> ThreadDumpAnalysis {
             uniqueStackTraces = GroupUniqueStackTraces(td),
             threadPools = ResolveThreadPools(td),
             tomcatAnalysis = AnalyzeTomcat(td),
+            missingLocks = FindMissingLocks(td),
         )
 	}
 }

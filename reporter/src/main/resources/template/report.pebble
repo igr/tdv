@@ -26,7 +26,8 @@
     <a href="#exceptions">Exceptions</a>
     <a href="#cpu">CPU consuming</a>
     <a href="#ust">Identical stack trace</a>
-    <a href="{{ reportThreadsName }}">All Threads</a>
+    <a href="#missing">Missing locks</a>
+    <a href="{{ reportThreadsName }}">All&nbsp;Threads</a>
 </header>
 <main id="content">
     <h1>ThreadDump Report</h1>
@@ -61,6 +62,9 @@
         </div>
         <div class="block">
             <h3>Tomcat Executors pool</h3>
+            <div class="description">
+                Tomcat executor threads are used to process incoming requests.
+            </div>
             {{ threadStats(tomcat.tomcatExecutors, "tomcat_exec") }}
         </div>
     {% endif %}
@@ -112,6 +116,10 @@
     <a id="pools"></a>
     <div class="block">
         <h2>🏊‍♂️ Thread Pools: {{ pools.size }}</h2>
+        <div class="description">
+            List of detected thread pools. Thread pool is detected from the thread name,
+            by grouping threads with the similar name. May not be exact to the actual thread pools used in the application.
+        </div>
         <div class="graph" style="{{ noneIf(pools.size == 0) }}">
             <table class="styled-table">
                 <thead>
@@ -141,6 +149,12 @@
     <a id="blocks"></a>
     <div class="block">
         <h2>🛑 Blocks: {{ blockTree.size }}</h2>
+        <div class="description">
+            List of all blocks in the thread dump, sorted from highest to lowest blocking threads.
+            Nodes in the graph represent the method that is blocking other threads.
+            Nodes are clickable and will open corresponding thread in the report.
+            <b>Attention: if number of blocked thread is high.</b>
+        </div>
         {% for blockNode in blockTree %}
             {% set ex = explain.get(loop.index) %}
             <h3>The method <b>{{ ex.className }}.<span class="method">{{ ex.methodName }}</span></b> (line
@@ -163,6 +177,11 @@
     <a id="flamegraph"></a>
     <div class="block">
         <h2>🔥 Flamegraph</h2>
+        <div class="description">
+            Flamegraph of all method calls in the thread dump.
+            Indicates how many threads are executing the same method.
+            This graph is interactive - you can zoom in and out.
+        </div>
         <div class="graph">
             <div id="flamechart"></div>
         </div>
@@ -171,6 +190,10 @@
     <a id="callgraph"></a>
     <div class="block">
         <h2>☎️ Call Tree</h2>
+        <div class="description">
+            The tree of all method calls in the thread dump.
+            Indicates how many threads are executing the same method.
+        </div>
         <div class="graph">
                 {{ callgraph | raw }}
         </div>
@@ -179,6 +202,9 @@
     <a id="exceptions"></a>
     <div class="block">
         <h2>🚨 Exceptions: {{ exceptions.size }}</h2>
+        <div class="description">
+            List of all captured exceptions in the thread dump.
+        </div>
         <div class="graph" style="text-align: left; {{ noneIf(exceptions.size == 0) }}">
             <div class="boxes">
                     {% for ed in exceptions %}
@@ -206,6 +232,11 @@
     <a id="cpu"></a>
     <div class="block">
         <h2>🍪 CPU consuming threads</h2>
+        <div class="description">
+            List ot top 20 threads with high CPU consumption.
+            Note that the percentage is not the actual CPU usage -
+            it is calculated based on the thread's CPU time and the total CPU time.
+        </div>
         <div class="graph" style="text-align: left">
                 {% for c in cpuc %}
                 <p>
@@ -219,6 +250,9 @@
     <a id="ust"></a>
     <div class="block">
         <h2>🪞Threads (10+) with identical stack traces: {{ usts.size }}</h2>
+        <div class="description">
+            This section lists stack traces that are identical across multiple threads.
+        </div>
         <div class="graph" style="{{ noneIf(usts.size == 0) }}">
             <table class="styled-table">
                 <thead>
@@ -240,6 +274,29 @@
                 {% endfor %}
             </table>
         </div>
+    </div>
+    <a id="missing"></a>
+    <div class="block">
+        <h2>🔍 Missing locks (10+): {{ missing.size }}</h2>
+        <div class="description">
+            Sometimes threads are waiting or being parked for the lock that <i>does not</i> exist in the thread dump.
+            This section lists such missing locks and the number of locks parked for it (if > 10).
+            <b>Attention: if the number of parked locks is high.</b>
+        </div>
+        <table class="styled-table" style="{{ noneIf(missing.size == 0) }}">
+            <thead>
+            <tr>
+                <th>Missing lock</th>
+                <th>Parked waiting for lock</th>
+            </tr>
+            </thead>
+            {% for miss in missing %}
+                <tr>
+                    <td><b>{{ miss.lock }}</b></td>
+                    <td>{{ miss.count }}</td>
+                </tr>
+            {% endfor %}
+        </table>
     </div>
 </main>
 
