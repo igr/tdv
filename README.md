@@ -89,10 +89,12 @@ Sort threads by CPU consumption.
 
 ![](doc/9-identical.png)
 
+### 🔍 List of missing locks
+
 ## TODO
 
 + [X] Stats per thread pool
 + [ ] Deadlocks detection (as soon as I get a thread dump with a deadlock)
 + [ ] Detect complex deadlocks (e.g. A -> B -> C -> A)
 + [ ] Thread histogram per priorities
-+ [ ] Latest executed methods?
++ [ ] Latest executed methods?]
