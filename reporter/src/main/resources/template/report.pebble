@@ -34,7 +34,23 @@
     <a id="threads"></a>
     <div class="block">
         <h2>🧵 Threads: {{ stats.all.totalThreads }}</h2>
-        {{ threadStats(stats.all, "all") }}
+        <div>
+            &nbsp;<a href="#" onclick="return show('threads_all', ['threads_app', 'threads_jvm']);">ALL</a>&nbsp;
+            &nbsp;<a href="#" onclick="return show('threads_app', ['threads_all', 'threads_jvm']);">APP</a>&nbsp;
+            &nbsp;<a href="#" onclick="return show('threads_jvm', ['threads_app', 'threads_all']);">JVM</a>&nbsp;
+        </div>
+        <div id="threads_all">
+            <h3>ALL threads</h3>
+            {{ threadStats(stats.all, "all") }}
+        </div>
+        <div id="threads_app" style="display: none">
+            <h3>Application threads</h3>
+            {{ threadStats(stats.app, "app") }}
+        </div>
+        <div id="threads_jvm" style="display: none">
+            <h3>JVM threads</h3>
+            {{ threadStats(stats.sys, "sys") }}
+        </div>
     </div>
 
     {% if tomcat.stats.totalThreads != 0 %}
@@ -253,6 +269,8 @@
 
     window.onload = function () {
         {{ threadStatsPiechart(stats.all, "all") }}
+        {{ threadStatsPiechart(stats.app, "app") }}
+        {{ threadStatsPiechart(stats.sys, "sys") }}
         {% if tomcat.stats.totalThreads != 0 %}
         {{ threadStatsPiechart(tomcat.stats, "tomcat") }}
         {{ threadStatsPiechart(tomcat.tomcatExecutors, "tomcat_exec") }}
@@ -280,6 +298,14 @@
             .datum(flamegraphData)
             .call(chart);
     };
+
+    function show(showId, hideIds) {
+        document.getElementById(showId).style.display = "block";
+        hideIds.forEach(function (id) {
+            document.getElementById(id).style.display = "none";
+        });
+        return false;
+    }
 
     function toggleDiv(id) {
         const element = document.getElementById(id);

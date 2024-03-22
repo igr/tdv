@@ -28,6 +28,10 @@ The report will contain the following sections:
 
 ### 🧵 Threads stats
 
++ ALL threads
++ Application threads
++ System threads
+
 ![](doc/1-stats.png)
 
 ### 😸 Tomcat
