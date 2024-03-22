@@ -26,10 +26,6 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
             reportName
         context["reportThreadsName"] =
             reportThreadsName
-        context["tdName"] =
-            td.name
-        context["tdDate"] =
-            td.date
         context["stats"] =
             tda.stats
         context["blockTree"] =

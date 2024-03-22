@@ -111,9 +111,11 @@ internal object CalculateSystemStats : (Collection<SystemThreadInfo>) -> ThreadD
 
 }
 
-
-internal object CalculateStats : (ThreadDump) -> ThreadDumpStats {
-    override fun invoke(td: ThreadDump): ThreadDumpStats {
+/**
+ * Calculate ALL stats.
+ */
+internal object CalculateStats : (ThreadDump) -> ThreadDumpAllStats {
+    override fun invoke(td: ThreadDump): ThreadDumpAllStats {
         val appStats = CalculateAppStats(td.threads)
         val systemStats = CalculateSystemStats(td.systemThreads)
 
@@ -135,7 +137,7 @@ internal object CalculateStats : (ThreadDump) -> ThreadDumpStats {
         val gcRefineThreads = appStats.gcRefineThreads + systemStats.gcRefineThreads
         val gcTotalThreads = appStats.gcTotalThreads + systemStats.gcTotalThreads
 
-        return ThreadDumpStats(
+        val allStats = ThreadDumpStats(
             totalThreads,
             blockedThreads,
             percent(blockedThreads, totalThreads),
@@ -160,6 +162,12 @@ internal object CalculateStats : (ThreadDump) -> ThreadDumpStats {
             percent(gcConcurrentThreadsCount, gcTotalThreads),
             gcRefineThreads = gcRefineThreads,
             percent(gcRefineThreads, gcTotalThreads),
+        )
+
+        return ThreadDumpAllStats(
+            sys = systemStats,
+            app = appStats,
+            all = allStats,
         )
     }
 

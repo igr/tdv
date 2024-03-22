@@ -26,3 +26,12 @@ data class ThreadDumpStats(
     val gcRefineThreads: Int,
     val gcRefineThreadsPercent: Float,
 )
+
+/**
+ * Holds the thread dump stats for the system, application, and all threads.
+ */
+data class ThreadDumpAllStats(
+    val sys: ThreadDumpStats,
+    val app: ThreadDumpStats,
+    val all: ThreadDumpStats,
+)

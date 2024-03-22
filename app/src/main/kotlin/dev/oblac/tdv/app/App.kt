@@ -4,7 +4,6 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.path
 import dev.oblac.tdv.analyzer.AnalyzeThreadDump
-import dev.oblac.tdv.parser.ParseThreadDump
 import dev.oblac.tdv.reporter.GenerateReport
 import java.nio.file.Files
 import java.nio.file.Path
@@ -26,11 +25,8 @@ fun main(args: Array<String>) {
 
 internal fun generateThreadDumpReport(threadDumpFile: Path) {
     val threadDumpName = threadDumpFile.fileName.toString()
-
     println("Generating report for $threadDumpName")
-
-    val tdContent = Files.readString(threadDumpFile)
-    val td = ParseThreadDump(tdContent)
+    val td = parseThreadDumpReport(threadDumpFile)
     val tda = AnalyzeThreadDump(td)
 
     GenerateReport(td, tda, threadDumpName).files.forEach {

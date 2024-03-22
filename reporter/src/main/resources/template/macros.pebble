@@ -60,3 +60,5 @@
     </tr>
 </table>
 {% endmacro %}
+
+{% macro noneIf(booleanExpression) %}{% if booleanExpression %}display:none{% endif %}{% endmacro %}

@@ -3,18 +3,22 @@ package dev.oblac.tdv.parser
 import dev.oblac.tdv.domain.AppThreadInfo
 import dev.oblac.tdv.domain.SystemThreadInfo
 import dev.oblac.tdv.domain.ThreadDump
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 object ParseThreadDump : (String) -> ThreadDump {
 
 	override fun invoke(threadDumpText: String): ThreadDump {
 		val tdi = ThreadDumpIterator(threadDumpText)
+        val line0 = tdi.peek()
 
-		val date = LocalDateTime.parse(tdi.next(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-		val name = tdi.next().substringAfter("Full thread dump ").substringBefore(":")
-
-		tdi.skip()
+        // header
+        if (line0.endsWith(':')) {
+            // Header line with date and name, looks like this:
+            // 3801084:
+            // 2024-03-20 17:49:29
+            // Full thread dump OpenJDK 64-Bit Server VM (17.0.10+7-LTS mixed mode, sharing):
+            // <empty line>
+            tdi.skip(4)
+        }
 
 		tdi.peek().let {
 			if (it == "Threads class SMR info:") {
@@ -22,7 +26,7 @@ object ParseThreadDump : (String) -> ThreadDump {
 			}
 		}
 
-		tdi.skip()
+		tdi.skipEmptyLines()
 
 		val threads = mutableListOf<AppThreadInfo>()
 		val sysThreads = mutableListOf<SystemThreadInfo>()
@@ -40,18 +44,19 @@ object ParseThreadDump : (String) -> ThreadDump {
 			}
 
 			tdi.skipEmptyLines()
+            if (tdi.peek().contains("Locked ownable synchronizers:")) { // todo: see what to do whit this
+                tdi.skip(2)
+            }
+            tdi.skipEmptyLines()
 		}
 
 		return ThreadDump(
-			name,
-			date,
 			threads,
 			sysThreads
 		)
 	}
 
-
-	private fun skipSMR(tdi: ThreadDumpIterator) {
+    private fun skipSMR(tdi: ThreadDumpIterator) {
         fun detectSmr(line: String): Boolean {
             return line.startsWith("_java_thread_list=")
                 || line.startsWith("_to_delete_list=")
@@ -68,5 +73,17 @@ object ParseThreadDump : (String) -> ThreadDump {
             tdi.skip()
         }
 	}
+
+    /**
+     * Parses the date line if it exists.
+     */
+    private fun isLineWithDate(line: String): Boolean {
+        return try {
+            parseDateTime(line)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 
 }

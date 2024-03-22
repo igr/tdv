@@ -1,17 +1,25 @@
-{# @pebvariable name="tdName" type="java.lang.String" #}
 {# @pebvariable name="td" type="java.util.List<dev.oblac.tdv.reporter.ReportThreadStack>" #}
 {% import "./macros.pebble" %}
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thread Dump : {{ tdDate }}</title>
+    <title>Thread Dump : {{ reportThreadsName }}</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+    body {
+        margin-top:0;
+    }
+    h1 {
+        margin:0;
+        padding: 0;
+    }
+    </style>
 </head>
 <body>
 <main id="content">
-    <h1>{{ tdDate }}</h1>
-    <div>{{ tdName }}</div>
+    <h1>Thread Dump</h1>
+    <div>🏡 <a href="{{ reportName }}">report</a></div>
 
     <a id="all"></a>
     <div class="block">

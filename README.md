@@ -12,8 +12,10 @@ I have no intention of making it a full-fledged tool 🤷‍♂️.
 Download the fat jar and run it:
 
 ```shell
-java -jar tdv-X.Y.Z-all.jar <thread-dump-file>
+java -jar tdv-X.Y.Z-all.jar <thread-dump-file>[.gz]
 ```
+
+The input may be a raw thread dump or a _gzipped_ thread dump.
 
 The report will be generated in the `out` subfolder as HTML file.
 It is a huge report, and it is not beautiful, but it is functional.
@@ -22,7 +24,7 @@ It is a huge report, and it is not beautiful, but it is functional.
 
 The report will contain the following sections:
 
-> ⚠️ The screenshots are probably not up-to-date!
+> ⚠️ The screenshots are NOT up-to-date!
 
 ### 🧵 Threads stats
 
@@ -30,7 +32,7 @@ The report will contain the following sections:
 
 ### 😸 Tomcat
 
-If Tomcat is detected, there will be a section with Tomcat stats.
+If Tomcat is detected, there will be a section with Tomcat stats: for all Tomcat threads, and only for **Tomcat executor pool**.
 
 ### 😈 Daemon stats
 

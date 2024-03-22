@@ -18,15 +18,15 @@ class AppTest20230908190546 {
     @Test
     fun testStats() {
         val stats = tda.stats
-        assertEquals(2608, stats.totalThreads)
-        assertEquals(11, stats.blockedThreads)
-        assertEquals(1312, stats.timedWaitingThreads)
-        assertEquals(228, stats.waitingThreads)
-        assertEquals(0, stats.newThreads)
-        assertEquals(872, stats.runnableThreads)
-        assertEquals(185, stats.terminatedThreads)
-        assertEquals(2422, stats.daemonCount)
-        assertEquals(186, stats.nonDaemonCount)
+        assertEquals(2608, stats.all.totalThreads)
+        assertEquals(11, stats.all.blockedThreads)
+        assertEquals(1312, stats.all.timedWaitingThreads)
+        assertEquals(228, stats.all.waitingThreads)
+        assertEquals(0, stats.all.newThreads)
+        assertEquals(872, stats.all.runnableThreads)
+        assertEquals(185, stats.all.terminatedThreads)
+        assertEquals(2422, stats.all.daemonCount)
+        assertEquals(186, stats.all.nonDaemonCount)
     }
     @Test
     fun testBlockTree() {
@@ -74,6 +74,6 @@ class AppTest20230908190546 {
     @Test
     fun MaxCPU() {
         val maxCpuThreads = tda.maxCpuThreads
-        assertEquals(10, maxCpuThreads.size)
+        assertEquals(20, maxCpuThreads.size)
     }
 }

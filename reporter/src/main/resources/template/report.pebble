@@ -1,6 +1,5 @@
 {# @pebvariable name="reportName" type="java.lang.String" #}
-{# @pebvariable name="tdName" type="java.lang.String" #}
-{# @pebvariable name="stats" type="dev.oblac.tdv.analyzer.ThreadDumpStats" #}
+{# @pebvariable name="stats" type="dev.oblac.tdv.analyzer.ThreadDumpAllStats" #}
 {# @pebvariable name="tomcat" type="dev.oblac.tdv.analyzer.TomcatAnalysis" #}
 {# @pebvariable name="blockTree" type="dev.oblac.tdv.analyzer.BlockTree" #}
 {# @pebvariable name="ex" type="dev.oblac.tdv.reporter.BlockExplanation" #}
@@ -10,7 +9,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thread Dump Report: {{ tdDate }}</title>
+    <title>Thread Dump Report: {{ reportName }}</title>
     <link href="d3-flamegraph.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -30,19 +29,18 @@
     <a href="{{ reportThreadsName }}">All Threads</a>
 </header>
 <main id="content">
-    <h1>{{ tdDate }}</h1>
-    <div>{{ tdName }}</div>
+    <h1>ThreadDump Report</h1>
 
     <a id="threads"></a>
     <div class="block">
-        <h2>🧵 Threads</h2>
-        {{ threadStats(stats, "all") }}
+        <h2>🧵 Threads: {{ stats.all.totalThreads }}</h2>
+        {{ threadStats(stats.all, "all") }}
     </div>
 
     {% if tomcat.stats.totalThreads != 0 %}
         <a id="tomcat"></a>
         <div class="block">
-            <h2>😸 Tomcat threads</h2>
+            <h2>😸 Tomcat threads: {{ tomcat.stats.totalThreads }}</h2>
             {{ threadStats(tomcat.stats, "tomcat") }}
         </div>
         <div class="block">
@@ -58,15 +56,15 @@
             <div class="boxes">
                 <div class="box">
                     <div class="box-title">TOTAL</div>
-                    <div class="box-value">{{ stats.totalThreads }}</div>
+                    <div class="box-value">{{ stats.all.totalThreads }}</div>
                 </div>
                 <div class="box">
                     <div class="box-title">DAEMON</div>
-                    <div class="box-value">{{ stats.daemonCount }}</div>
+                    <div class="box-value">{{ stats.all.daemonCount }}</div>
                 </div>
                 <div class="box">
                     <div class="box-title">NON-DAEMON</div>
-                    <div class="box-value">{{ stats.nonDaemonCount }}</div>
+                    <div class="box-value">{{ stats.all.nonDaemonCount }}</div>
                 </div>
             </div>
             <div id="chart_daemons" style="width:400px;height:400px;"></div>
@@ -75,20 +73,20 @@
 
     <a id="gc"></a>
     <div class="block">
-        <h2>🧹 GC Threads: {{ stats.gcTotalThreads }}</h2>
-        <div class="grid21">
+        <h2>🧹 GC Threads: {{ stats.all.gcTotalThreads }}</h2>
+        <div class="grid21" style="{{ noneIf(stats.all.gcTotalThreads == 0) }}">
             <div class="boxes">
                 <div class="box">
                     <div class="box-title">WORKER</div>
-                    <div class="box-value">{{ stats.gcWorkerThreads }}</div>
+                    <div class="box-value">{{ stats.all.gcWorkerThreads }}</div>
                 </div>
                 <div class="box">
                     <div class="box-title">CONCURRENT</div>
-                    <div class="box-value">{{ stats.gcConcurrentThreads }}</div>
+                    <div class="box-value">{{ stats.all.gcConcurrentThreads }}</div>
                 </div>
                 <div class="box">
                     <div class="box-title">REFINE</div>
-                    <div class="box-value">{{ stats.gcRefineThreads }}</div>
+                    <div class="box-value">{{ stats.all.gcRefineThreads }}</div>
                 </div>
             </div>
             <div id="chart_gc" style="width:400px;height:400px;"></div>
@@ -97,8 +95,8 @@
 
     <a id="pools"></a>
     <div class="block">
-        <h2>🏊‍♂️ Thread Pools</h2>
-        <div class="graph">
+        <h2>🏊‍♂️ Thread Pools: {{ pools.size }}</h2>
+        <div class="graph" style="{{ noneIf(pools.size == 0) }}">
             <table class="styled-table">
                 <thead>
                 <tr>
@@ -126,7 +124,7 @@
 
     <a id="blocks"></a>
     <div class="block">
-        <h2>🛑 Blocks</h2>
+        <h2>🛑 Blocks: {{ blockTree.size }}</h2>
         {% for blockNode in blockTree %}
             {% set ex = explain.get(loop.index) %}
             <h3>The method <b>{{ ex.className }}.<span class="method">{{ ex.methodName }}</span></b> (line
@@ -164,8 +162,8 @@
 
     <a id="exceptions"></a>
     <div class="block">
-        <h2>🚨 Exceptions</h2>
-        <div class="graph" style="text-align: left">
+        <h2>🚨 Exceptions: {{ exceptions.size }}</h2>
+        <div class="graph" style="text-align: left; {{ noneIf(exceptions.size == 0) }}">
             <div class="boxes">
                     {% for ed in exceptions %}
                     <div class="box box-wide">
@@ -204,8 +202,8 @@
 
     <a id="ust"></a>
     <div class="block">
-        <h2>🪞Threads with identical stack trace (up to 10)</h2>
-        <div class="graph">
+        <h2>🪞Threads (10+) with identical stack traces: {{ usts.size }}</h2>
+        <div class="graph" style="{{ noneIf(usts.size == 0) }}">
             <table class="styled-table">
                 <thead>
                 <tr>
@@ -238,13 +236,13 @@
 <script type="text/javascript" src="d3-flamegraph.min.js"></script>
 <script>
     const daemonsData = [
-        {"name": "DAEMON", y:{{ stats.daemonCountPercent | numberformat("#.##") }} },
-        {"name": "NON-DAEMON", y:{{ stats.nonDaemonCountPercent | numberformat("#.##") }} },
+        {"name": "DAEMON", y:{{ stats.all.daemonCountPercent | numberformat("#.##") }} },
+        {"name": "NON-DAEMON", y:{{ stats.all.nonDaemonCountPercent | numberformat("#.##") }} },
     ]
     const gcStats = [
-        {label: "Worker", y:{{ stats.gcWorkerThreadsPercent | numberformat("#.##") }} },
-        {label: "Concurrent", y:{{ stats.gcConcurrentThreadsPercent | numberformat("#.##") }} },
-        {label: "Refine", y:{{ stats.gcRefineThreadsPercent | numberformat("#.##") }} },
+        {name: "Worker", y:{{ stats.all.gcWorkerThreadsPercent | numberformat("#.##") }} },
+        {name: "Concurrent", y:{{ stats.all.gcConcurrentThreadsPercent | numberformat("#.##") }} },
+        {name: "Refine", y:{{ stats.all.gcRefineThreadsPercent | numberformat("#.##") }} },
     ]
 
         {% for blockNode in blockTree %}
@@ -254,7 +252,7 @@
     const flamegraphData = {{ flamegraph | json | raw }};
 
     window.onload = function () {
-        {{ threadStatsPiechart(stats, "all") }}
+        {{ threadStatsPiechart(stats.all, "all") }}
         {% if tomcat.stats.totalThreads != 0 %}
         {{ threadStatsPiechart(tomcat.stats, "tomcat") }}
         {{ threadStatsPiechart(tomcat.tomcatExecutors, "tomcat_exec") }}

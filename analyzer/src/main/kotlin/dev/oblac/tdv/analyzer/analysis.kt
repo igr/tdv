@@ -5,7 +5,7 @@ import dev.oblac.tdv.domain.ThreadDump
 
 data class ThreadDumpAnalysis(
     val threadDump: ThreadDump,
-    val stats: ThreadDumpStats,
+    val stats: ThreadDumpAllStats,
     val blockTree: BlockTree,
     val callTree: CallTreeNode,
     val exceptions: List<AppThreadInfo>,

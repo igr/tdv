@@ -20,15 +20,15 @@ class AppTest20240216120818 {
     @Test
     fun testStats() {
         val stats = tda.stats
-        Assertions.assertEquals(2579, stats.totalThreads)
-        Assertions.assertEquals(356, stats.blockedThreads)
-        Assertions.assertEquals(571, stats.timedWaitingThreads)
-        Assertions.assertEquals(177, stats.waitingThreads)
-        Assertions.assertEquals(0, stats.newThreads)
-        Assertions.assertEquals(1424, stats.runnableThreads)
-        Assertions.assertEquals(51, stats.terminatedThreads)
-        Assertions.assertEquals(2306, stats.daemonCount)
-        Assertions.assertEquals(273, stats.nonDaemonCount)
+        Assertions.assertEquals(2579, stats.all.totalThreads)
+        Assertions.assertEquals(356, stats.all.blockedThreads)
+        Assertions.assertEquals(571, stats.all.timedWaitingThreads)
+        Assertions.assertEquals(177, stats.all.waitingThreads)
+        Assertions.assertEquals(0, stats.all.newThreads)
+        Assertions.assertEquals(1424, stats.all.runnableThreads)
+        Assertions.assertEquals(51, stats.all.terminatedThreads)
+        Assertions.assertEquals(2306, stats.all.daemonCount)
+        Assertions.assertEquals(273, stats.all.nonDaemonCount)
     }
 
     @Test
