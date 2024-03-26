@@ -2,8 +2,7 @@
 
 🚀 **Offline** Thread Dump Analyzer.
 
-Disclaimer: I am making this for my own use.
-I have no intention of making it a full-fledged tool 🤷‍♂️.
+Disclaimer: While I am making this for my own use, I will _try_ to fix reported issues, as much time allows me to 🤷‍♂️.
 
 ☕️ You can still [buy me a coffee](https://www.buymeacoffee.com/oblac) :)
 
@@ -15,7 +14,7 @@ Download the fat jar and run it:
 java -jar tdv-X.Y.Z-all.jar <thread-dump-file>[.gz]
 ```
 
-The input may be a raw thread dump or a _gzipped_ thread dump.
+The input may be a 1) raw thread dump or 2) a _gzipped_ thread dump.
 
 The report will be generated in the `out` subfolder as HTML file.
 It is a huge report, and it is not beautiful, but it is functional.
