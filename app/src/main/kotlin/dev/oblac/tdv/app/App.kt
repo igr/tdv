@@ -3,6 +3,9 @@ package dev.oblac.tdv.app
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.path
+import com.github.ajalt.mordant.rendering.TextColors.brightGreen
+import com.github.ajalt.mordant.rendering.TextStyles.bold
+import com.github.ajalt.mordant.terminal.Terminal
 import dev.oblac.tdv.analyzer.AnalyzeThreadDump
 import dev.oblac.tdv.reporter.GenerateReport
 import java.nio.file.Files
@@ -24,13 +27,21 @@ fun main(args: Array<String>) {
 }
 
 internal fun generateThreadDumpReport(threadDumpFile: Path) {
+    val t = Terminal()
+
     val threadDumpName = threadDumpFile.fileName.toString()
-    println("Generating report for $threadDumpName")
+    t.println("Generating report for ${(bold)(threadDumpName)}")
+
     val td = parseThreadDumpReport(threadDumpFile)
     val tda = AnalyzeThreadDump(td)
 
+    val destination = Path.of("out", threadDumpName)
+    Files.createDirectories(destination)
+
     GenerateReport(td, tda, threadDumpName).files.forEach {
-        Files.writeString(Path.of("out", it.name), it.content)
+        Files.writeString(destination.resolve(it.name), it.content)
     }
-    println("Report for $threadDumpName generated")
+    t.println("Report generated:")
+    t.println(brightGreen("./${destination}/index.html"))
+    t.println("Done.")
 }

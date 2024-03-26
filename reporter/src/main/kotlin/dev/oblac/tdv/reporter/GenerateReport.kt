@@ -17,8 +17,8 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
 
         val compiledTemplateReport = engine.getTemplate("template/report.pebble")
         val compiledTemplateThreads = engine.getTemplate("template/threads.pebble")
-        val reportName = "report-${name}.html"
-        val reportThreadsName = "report-${name}-td.html"
+        val reportName = "index.html"
+        val reportThreadsName = "threads.html"
 
         val context: MutableMap<String, Any> = HashMap()
 
