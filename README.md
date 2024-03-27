@@ -23,72 +23,19 @@ It is a huge report, and it is not beautiful, but it is functional.
 
 The report will contain the following sections:
 
-> ⚠️ The screenshots are NOT up-to-date and may be missing.
++ [Thread Stats](doc/report.md#-threads-stats) - general stats about threads (all, application, system)
++ [Tomcat](doc/report.md#-tomcat) - Tomcat stats (if detected)
++ [Daemon Stats](doc/report.md#-daemon-stats) - stats about daemon threads
++ [GC Stats](doc/report.md#-gc-stats) - stats about garbage collection
++ [Pools](doc/report.md#-pools) - thread pools
++ [Blocks](doc/report.md#-blocks) - blocks analysis
++ [Flamegraph](doc/report.md#-flamegraph) - interactive flamegraph
++ [Call Tree](doc/report.md#-call-tree) - call tree
++ [Exceptions](doc/report.md#-exceptions) - all captured exceptions
++ [CPU consuming threads](doc/report.md#-cpu-consuming-threads) - threads sorted by CPU consumption
++ [Threads with identical stack trace](doc/report.md#-threads-with-identical-stack-trace) - threads
++ [List of missing locks](doc/report.md#-list-of-missing-locks) - locks that are not released
 
-### 🧵 Threads stats
-
-+ ALL threads
-+ Application threads
-+ System threads
-
-![](doc/1-stats.png)
-
-### 😸 Tomcat
-
-If Tomcat is detected, there will be a section with Tomcat stats: for all Tomcat threads, and only for **Tomcat executor pool**.
-
-### 😈 Daemon stats
-
-![](doc/2-daemon.png)
-
-### 🧹 GC stats
-
-![](doc/3-gc.png)
-
-### 🏊‍♂️ Pools
-
-Resolve thread pools from similar thread names.
-
-![](doc/10-thread-pools.png)
-
-### 🛑 Blocks
-
-Analysis of all the blocks in the thread dump.
-Finds locks and all the threads that are waiting for them.
-
-![](doc/4-blocks-a.png)
-
-For each lock generates a report and  a graph like this (redacted for privacy):
-
-![](doc/4-blocks-b.png)
-
-### 🔥 Flamegraph
-
-Interactive flamegraph of the thread stack traces.
-
-![](doc/5-flamegraph.png)
-
-### ☎️ Call Tree
-
-![](doc/6-calltree.png)
-
-### 🚨 Exceptions
-
-All captured exceptions.
-
-![](doc/7-exceptions.png)
-
-### 🍪 CPU consuming threads
-
-Sort threads by CPU consumption.
-
-![](doc/8-cpu.png)
-
-### 🪞 Threads with identical stack trace
-
-![](doc/9-identical.png)
-
-### 🔍 List of missing locks
 
 ## TODO
 

@@ -17,7 +17,7 @@ release: clean build
     ls app/build/libs/*.jar
 
 run target:
-    java -jar app/build/libs/tdv-0.5.0-all.jar {{target}}
+    java -jar app/build/libs/tdv-0.5.5-all.jar {{target}}
 
 examples:
     just run in/Thread.print.20230908190546
