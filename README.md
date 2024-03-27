@@ -21,19 +21,19 @@ It is a huge report, and it is not beautiful, but it is functional.
 
 ## TDV Report
 
-The report will contain the following sections:
+The report contains the following sections:
 
 + [Thread Stats](doc/report.md#-threads-stats) - general stats about threads (all, application, system)
 + [Tomcat](doc/report.md#-tomcat) - Tomcat stats (if detected)
 + [Daemon Stats](doc/report.md#-daemon-stats) - stats about daemon threads
 + [GC Stats](doc/report.md#-gc-stats) - stats about garbage collection
-+ [Pools](doc/report.md#-pools) - thread pools
-+ [Blocks](doc/report.md#-blocks) - blocks analysis
-+ [Flamegraph](doc/report.md#-flamegraph) - interactive flamegraph
++ [Pools](doc/report.md#-pools) - detected thread pools
++ [Blocks](doc/report.md#-blocks) - thread blocking analysis
++ [Flamegraph](doc/report.md#-flamegraph) - interactive flamegraph of stack traces
 + [Call Tree](doc/report.md#-call-tree) - call tree
 + [Exceptions](doc/report.md#-exceptions) - all captured exceptions
 + [CPU consuming threads](doc/report.md#-cpu-consuming-threads) - threads sorted by CPU consumption
-+ [Threads with identical stack trace](doc/report.md#-threads-with-identical-stack-trace) - threads
++ [Threads with identical stack trace](doc/report.md#-threads-with-identical-stack-trace)
 + [List of missing locks](doc/report.md#-list-of-missing-locks) - locks that are not released
 
 
