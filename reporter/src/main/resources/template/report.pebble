@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thread Dump Report: {{ reportName }}</title>
+    <title>Thread Dump Report</title>
     <link href="d3-flamegraph.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -27,7 +27,8 @@
     <a href="#cpu">CPU consuming</a>
     <a href="#ust">Identical stack trace</a>
     <a href="#missing">Missing locks</a>
-    <a href="{{ reportThreadsName }}">All&nbsp;Threads</a>
+    <a href="{{ reportConsoleName }}" class="special">SQL</a>
+    <a href="{{ reportThreadsName }}" class="special">ALL</a>
 </header>
 <main id="content">
     <h1>ThreadDump Report</h1>

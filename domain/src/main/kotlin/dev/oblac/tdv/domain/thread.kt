@@ -6,6 +6,7 @@ import kotlin.time.DurationUnit
 @JvmInline
 value class ThreadNo(private val value: Int) {
     override fun toString() = value.toString()
+    fun toInt() = value
 }
 
 @JvmInline
@@ -63,7 +64,9 @@ enum class ThreadPriority(val priority: Int) {
 	P9(9),
 	P10(10);
 
-	companion object {
+    fun toInt(): Int = priority
+
+    companion object {
 		fun of(i: Int) = ThreadPriority.entries.first { it.priority == i }
 		fun default() = P5
 	}

@@ -37,6 +37,12 @@ The report contains the following sections:
 + [List of missing locks](doc/report.md#-list-of-missing-locks) - locks that are not released
 
 
+## TDV SQL Console
+
+Yes, you can query the thread dump using SQL.
+
++ [SQL Console](doc/console.md)
+
 ## TODO
 
 + [X] Stats per thread pool

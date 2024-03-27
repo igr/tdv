@@ -21,6 +21,10 @@ header a {
     padding: 10px;
     letter-spacing: -1px;
 }
+header a.special {
+    color: yellow;
+    font-weight: bold;
+}
 
 a {
     color: black;

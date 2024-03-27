@@ -17,8 +17,10 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
 
         val compiledTemplateReport = engine.getTemplate("template/report.pebble")
         val compiledTemplateThreads = engine.getTemplate("template/threads.pebble")
+        val compiledTemplateConsole = engine.getTemplate("template/console.pebble")
         val reportName = "index.html"
         val reportThreadsName = "threads.html"
+        val reportConsoleName = "console.html"
 
         val context: MutableMap<String, Any> = HashMap()
 
@@ -26,6 +28,8 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
             reportName
         context["reportThreadsName"] =
             reportThreadsName
+        context["reportConsoleName"] =
+            reportConsoleName
         context["stats"] =
             tda.stats
         context["blockTree"] =
@@ -97,11 +101,13 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
 
         val writerReport = StringWriter().also { compiledTemplateReport.evaluate(it, context) }
         val writerThreads = StringWriter().also { compiledTemplateThreads.evaluate(it, context) }
+        val writerConsole = StringWriter().also { compiledTemplateConsole.evaluate(it, context) }
 
         return Report(
             listOf(
                 ReportFile(reportName, writerReport.toString()),
                 ReportFile(reportThreadsName, writerThreads.toString()),
+                ReportFile(reportConsoleName, writerConsole.toString()),
                 ResourceFile("style.css").toReportFile(),
                 ResourceFile("canvasjs.min.js").toReportFile(),
                 ResourceFile("d3.v7.min.js").toReportFile(),
@@ -109,7 +115,8 @@ object GenerateReport : (ThreadDump, ThreadDumpAnalysis, String) -> Report {
                 ResourceFile("d3-flamegraph.min.js").toReportFile(),
                 ResourceFile("charts.js").toReportFile(),
                 ResourceFile("tree.js").toReportFile(),
-                ResourceFile("expand-collapse.svg").toReportFile()
+                ResourceFile("expand-collapse.svg").toReportFile(),
+                ResourceFile("alasql.js").toReportFile()
             )
         )
     }

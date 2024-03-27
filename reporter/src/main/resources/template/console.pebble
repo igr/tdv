@@ -1,0 +1,159 @@
+{# @pebvariable name="td" type="java.util.List<dev.oblac.tdv.reporter.ReportThreadStack>" #}
+{% import "./macros.pebble" %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thread Dump : Console</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="alasql.js"></script>
+    <style>
+    body {
+        margin-top:0;
+    }
+    h1 {
+        margin:0;
+        padding: 0;
+    }
+    textarea {
+        font-family: monospace;
+        font-size: 16px;
+        border: 1px solid #333;
+        padding: 10px;
+    }
+
+/* CSS */
+.button-3 {
+  appearance: none;
+  background-color: #2ea44f;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.button-3:focus:not(:focus-visible):not(.focus-visible) {
+  box-shadow: none;
+  outline: none;
+}
+
+.button-3:hover {
+  background-color: #2c974b;
+}
+
+.button-3:focus {
+  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+  outline: none;
+}
+
+.button-3:disabled {
+  background-color: #94d3a2;
+  border-color: rgba(27, 31, 35, .1);
+  color: rgba(255, 255, 255, .8);
+  cursor: default;
+}
+
+.button-3:active {
+  background-color: #298e46;
+  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+}
+.hint {
+    font-size: 12px;
+    font-family: monospace;
+    color: #666;
+    margin-top: 10px;
+    text-align: left;
+}
+    </style>
+</head>
+<body>
+<main id="content">
+    <h1>Thread Dump SQL Console</h1>
+    <div>🏡 <a href="{{ reportName }}">report</a></div>
+
+    <a id="all"></a>
+    <textarea id="console" style="width:100%;height:100px">select * from threads</textarea>
+    <div class="hint">
+    THREADS: id, name, state, priority, daemon, number
+    </div>
+    <div style="margin: 20px;">
+    <button class="button-3" role="button" onclick="runQuery()">RUN</button>
+    </div>
+    <div id="results" class="box" style="width:100%;">
+    <i>Results will be displayed here</i>
+    </div>
+</main>
+
+<footer>🚀 TDV</footer>
+</body>
+<script>
+const threads = [
+{% for t in td %}
+    {
+        id: '{{ t.threadId }}',
+        name: '{{ t.name }}',
+        state: '{{ t.state }}',
+        priority: {{ t.priority }},
+        daemon: {{ t.daemon }},
+        number: {{ t.number }}
+    },
+{% endfor %}
+]
+    window.onload = function () {
+        initDatabase();
+    };
+function initDatabase() {
+    alasql('CREATE TABLE threads (id String, name STRING, state STRING, priority NUMBER, daemon BOOLEAN, number NUMBER)');
+    alasql.tables.threads.data = threads;
+}
+function runQuery() {
+    const query = document.getElementById('console').value;
+    const results = alasql(query);
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+    if (results.length === 0) {
+        resultsDiv.innerHTML = 'No results';
+        return;
+    }
+    const table = document.createElement('table');
+    table.classList.add('styled-table');
+    const thead = document.createElement('thead');
+    const header = document.createElement('tr');
+    for (const key in results[0]) {
+        const th = document.createElement('th');
+        th.innerText = key;
+        header.appendChild(th);
+    }
+    thead.appendChild(header);
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+    for (const row of results) {
+        const tr = document.createElement('tr');
+        for (const key in row) {
+            const td = document.createElement('td');
+            td.innerText = row[key];
+            tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    resultsDiv.appendChild(table);
+}
+</script>
+</html>
