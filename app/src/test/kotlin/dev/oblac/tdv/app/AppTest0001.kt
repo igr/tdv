@@ -15,6 +15,7 @@ class AppTest0001 {
             tda = process("../issues/0001-threaddump.txt.gz")
         }
     }
+
     @Test
     fun testStats() {
         assertEquals(34, tda.stats.all.totalThreads)

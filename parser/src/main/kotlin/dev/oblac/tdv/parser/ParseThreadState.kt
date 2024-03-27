@@ -10,7 +10,7 @@ internal object ParseThreadState: (ThreadDumpIterator) -> ThreadState {
 
 	override fun invoke(tdi: ThreadDumpIterator): ThreadState {
 		val stateLine = tdi.next().trim()
-		val state = THREAD_STATUS_PARSE_REGEX.find(stateLine)?.groups?.get("state")?.value ?: throw IllegalStateException("Invalid thread status: $stateLine")
+		val state = THREAD_STATUS_PARSE_REGEX.find(stateLine)?.groups?.get("state")?.value ?: throw ParserException("Invalid thread status: $stateLine", tdi)
 		val split = state.split(" ")
 
 		val threadState = ThreadState.valueOf(split[0])

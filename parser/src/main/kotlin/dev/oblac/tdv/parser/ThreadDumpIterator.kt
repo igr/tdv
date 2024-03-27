@@ -1,6 +1,10 @@
 package dev.oblac.tdv.parser
 
-internal class ThreadDumpIterator(threadDumpText: String) : Iterator<String> {
+interface ThreadDumpLocation {
+    override fun toString(): String
+}
+
+internal class ThreadDumpIterator(threadDumpText: String) : Iterator<String>, ThreadDumpLocation {
 	private val lines = threadDumpText.lines()
 	private var i = 0
 
@@ -27,7 +31,7 @@ internal class ThreadDumpIterator(threadDumpText: String) : Iterator<String> {
 
 	override fun toString(): String {
 		return """
-			|[tdi] ${i-1}: ${lines[i-1]}
+			|[tdi] ${i-1}: ${if (i == 0) "<START>" else lines[i-1]}
 			|[tdi] $i: ${lines[i]}
 			|[tdi] ${i+1}: ${lines[i+1]}
 		""".trimMargin()
@@ -42,6 +46,15 @@ internal class ThreadDumpIterator(threadDumpText: String) : Iterator<String> {
 			}
 		}
 	}
+    fun skipNonEmptyLines() {
+        while (hasNext()) {
+            val line = next()
+            if (line.trim().isEmpty()) {
+                back()
+                break
+            }
+        }
+    }
 
 	fun skipUntilMatch(match: String) {
 		while (hasNext()) {

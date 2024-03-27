@@ -10,12 +10,17 @@ internal object ParseStackTrace : (ThreadDumpIterator) -> List<StackFrame> {
 
 		while (tdi.hasNext()) {
 			val line = tdi.next().trim()
-			if (line.isEmpty()) {
-				tdi.back()
-				break
-			}
-            if (line == "No compile task") {
-                break
+            when {
+                line.isEmpty() -> {
+                    tdi.back()
+                    break
+                }
+                line == "No compile task" -> {
+                    break
+                }
+                line.startsWith("Compiling:") -> {      // todo GC compiler thread
+                    break
+                }
             }
 
             val stackFrame = parseStackFrameLine(line.substring(3), tdi)    // "at " prefix
@@ -25,7 +30,7 @@ internal object ParseStackTrace : (ThreadDumpIterator) -> List<StackFrame> {
                 if (!lockLine.startsWith("- ")) {
                     break
                 }
-                val lock = parseLockLine(lockLine.substring(2))
+                val lock = parseLockLine(lockLine.substring(2), tdi)
                 stackFrame.locks.add(lock)
                 tdi.next()
             }
@@ -95,12 +100,12 @@ internal object ParseStackTrace : (ThreadDumpIterator) -> List<StackFrame> {
                     FileLine(-1)
                 )
             }
-            else -> throw IllegalStateException("Could not parse stack frame: $line at $tdi")
+            else -> throw ParserException("Could not parse stack frame: $line", tdi)
         }
         return stackFrame
     }
 
-    private fun parseLockLine(lockLine: String): Lock {
+    private fun parseLockLine(lockLine: String, tdi: ThreadDumpLocation): Lock {
         return when {
             lockLine.startsWith("waiting to lock") -> {
                 val matchResult = HEX_REF_REGEX.find(lockLine)
@@ -138,7 +143,7 @@ internal object ParseStackTrace : (ThreadDumpIterator) -> List<StackFrame> {
                 }
             }
             else -> {
-                throw IllegalStateException("Could not parse lock line: $lockLine")}
+                throw ParserException("Could not parse lock line: $lockLine", tdi)}
         }
     }
 }
